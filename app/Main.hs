@@ -13,7 +13,7 @@ execAll lines env = foldl exec env lines  where
         (Left err) -> env
         (Right ex) -> do
             case ex of
-                Assign v e -> snd $ (evalAssign v e) `runState` env
+                Define v e -> snd $ (evalDefine v e) `runState` env
 
 showGlobal :: (Variable, Expression) -> IO ()
 showGlobal (n, e) = putStrLn ("   " ++ show n ++ " = " ++ show e)
@@ -27,8 +27,8 @@ execute line env =
             return env
         Right c -> do
             case c of 
-                Assign v e -> do 
-                    let (res, env') = (evalAssign v e) `runState` env
+                Define v e -> do 
+                    let (res, env') = (evalDefine v e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
                         Right f -> putStrLn ("- added " ++ show f ++ " to environment as " ++ show v) 

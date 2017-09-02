@@ -15,7 +15,7 @@ instance Show Expression where
     show (Abstraction n t)   = "λ" ++ n ++ "." ++ show t
     show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
 
-data Command = Assign Variable Expression
+data Command = Define Variable Expression
              | Execute Expression
              | Import String
              | Review String

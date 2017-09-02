@@ -36,8 +36,8 @@ evalApply f x = do
         Right f'' -> applyLambda f'' x 
 
 
-evalAssign :: Variable -> Expression -> Program (Failable Expression)
-evalAssign x y = do
+evalDefine :: Variable -> Expression -> Program (Failable Expression)
+evalDefine x y = do
     y' <- evalE y
     case y' of
         Left e -> return $ Left e

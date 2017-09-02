@@ -58,7 +58,7 @@ parseDefine = do
     char '='
     spaces
     y <- parseExpression
-    return $ Assign var y
+    return $ Define var y
 
 parseExecute :: Parser Command
 parseExecute = do
