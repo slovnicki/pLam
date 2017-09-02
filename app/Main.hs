@@ -5,6 +5,7 @@ import Eval
 import Control.Monad.State
 import System.IO (hFlush, stdout)
 import Debug.Trace
+import System.Exit
 
 
 execAll :: [String] -> Environment -> Environment
@@ -62,5 +63,8 @@ main = do
             putStr "LCI> "
             hFlush stdout
             line <- getLine
-            env' <- execute line env
-            repl env'
+            case line of
+                ":quit" -> exitSuccess
+                otherwise -> do
+                    env' <- execute line env
+                    repl env'
