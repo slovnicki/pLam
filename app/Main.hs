@@ -15,6 +15,7 @@ execAll lines env = foldl exec env lines  where
         (Right ex) -> do
             case ex of
                 Define v e -> snd $ (evalDefine v e) `runState` env
+                Comment c ->  env
 
 showGlobal :: (Variable, Expression) -> IO ()
 showGlobal (n, e) = putStrLn ("   " ++ show n ++ " = " ++ show e)
