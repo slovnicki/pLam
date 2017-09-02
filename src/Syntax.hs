@@ -16,6 +16,8 @@ instance Show Expression where
     show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
 
 data Command = Assign Variable Expression
+             | Execute Expression
+             | Import String
              deriving (Eq, Show)
 
 data LCILine = Command Command
@@ -29,7 +31,11 @@ type Program = State Environment
 data Error = SyntaxError ParseError
            | UndeclaredVariable Variable
            | FatalError String
-           deriving (Show)
+
+instance Show Error where
+    show (SyntaxError se)        = show se
+    show (UndeclaredVariable uv) = "Undeclared variable " ++ show uv ++ "\nTry typing\n define " ++ show uv ++ " = <lambda abstraction>\nto define it before use"
+    show (FatalError fe)         = show fe
 
 type Failable = Either Error
 

@@ -2,6 +2,7 @@ module Parser where
 
 import Control.Monad.State
 import Text.Parsec hiding (State)
+import Debug.Trace
 
 import Syntax
 
@@ -11,8 +12,14 @@ type Parser = Parsec String ()
 symbol :: Parser Char
 symbol = oneOf "`~!@#$%^&*-_+|;:',/?[]<>"
 
+fsymbol :: Parser Char
+fsymbol = oneOf "."
+
 identifier :: Parser String
 identifier = many1 $ letter <|> symbol <|> digit
+
+filename :: Parser String
+filename = many1 $ letter <|> fsymbol <|> digit
 
 parseVariable :: Parser Expression
 parseVariable = liftM Variable $ identifier
@@ -41,31 +48,43 @@ parseExpression = parseVariable
                <|> parseAbstraction
                <|> parseParens
 
-parseAssign :: Parser Command
-parseAssign = do
-    f <- identifier
+----------------------------------------------------------------
+parseDefine :: Parser Command
+parseDefine = do
+    comm <- string "define"
     spaces
-    xs <- identifier `endBy` spaces
+    var <- identifier
+    spaces
     char '='
     spaces
-    y <- parseAbstraction
-    return $ Assign f $ curry xs y where
-        curry (x:xs) y = Abstraction x $ curry xs y
-        curry [] y     = y
+    y <- parseExpression
+    return $ Assign var y
 
+parseExecute :: Parser Command
+parseExecute = do
+    comm <- string "execute"
+    spaces
+    ex <- parseExpression
+    return $ Execute ex
 
-{-
-readCommand :: String -> Failable Command
-readCommand input = case parse parseAssign "<stdin>" input of
-  Left err -> Left $ SyntaxError err
-  Right ex -> Right ex
--}
+parseImport :: Parser Command
+parseImport = do
+    comm <- string "import"
+    spaces
+    f <- filename
+    return $ Import f
 
-readLambda :: String -> Failable Expression
-readLambda input = case parse parseExpression "<stdin>" input of
-  Left err -> Left $ SyntaxError err
-  Right ex -> Right ex
+---------------------------------------------------------------------
+parseLine :: Parser Command
+parseLine = parseDefine
+         <|> parseExecute
+         <|> parseImport
 
-readExpr :: String -> Failable Expression
-readExpr input = readLambda input
+readLine :: String -> Failable Command
+readLine input = case parse parseLine "parser" input of
+    Left err -> Left $ SyntaxError err
+    Right l -> Right l 
+    
+readExpr :: String -> Failable Command
+readExpr input = readLine input
 
