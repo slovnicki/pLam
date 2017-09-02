@@ -1,5 +1,5 @@
 # λ-calculus interpreter
-(on the way to become fun programming language)
+(on its way to become fun programming language)
 
 ## Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
