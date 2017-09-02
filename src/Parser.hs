@@ -74,11 +74,19 @@ parseImport = do
     f <- filename
     return $ Import f
 
+parseReview :: Parser Command
+parseReview = do
+    comm <- string "review"
+    spaces
+    f <- identifier
+    return $ Review f
+
 ---------------------------------------------------------------------
 parseLine :: Parser Command
 parseLine = parseDefine
          <|> parseExecute
          <|> parseImport
+         <|> parseReview
 
 readLine :: String -> Failable Command
 readLine input = case parse parseLine "parser" input of

@@ -18,6 +18,7 @@ instance Show Expression where
 data Command = Assign Variable Expression
              | Execute Expression
              | Import String
+             | Review String
              deriving (Eq, Show)
 
 data LCILine = Command Command
