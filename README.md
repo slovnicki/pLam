@@ -2,7 +2,7 @@
 (on the way to become fun programming language)
 
 ## Prerequisites
-This project builds using haskell tool stack.
+This project builds using Haskell tool stack.
 
 ## Install
 On most Unix systems, you can get stack by typing:
