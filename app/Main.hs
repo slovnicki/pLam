@@ -41,7 +41,7 @@ execute line env =
                         Right f -> putStrLn ("----- result: " ++ show f)
                     return env
                 Import f -> do
-                    contents <- readFile f
+                    contents <- readFile ("import/" ++ f)
                     let exprs = lines contents
                     putStrLn ("- imported all from " ++ show f)
                     return $ execAll exprs env
@@ -52,6 +52,7 @@ execute line env =
                            mapM_ showGlobal env
                        -- otherwise lookup value
                     return env
+                Comment c -> return env
                     
 
 

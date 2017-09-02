@@ -19,6 +19,7 @@ data Command = Define Variable Expression
              | Execute Expression
              | Import String
              | Review String
+             | Comment String
              deriving (Eq, Show)
 
 data LCILine = Command Command

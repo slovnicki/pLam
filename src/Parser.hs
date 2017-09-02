@@ -15,8 +15,14 @@ symbol = oneOf "`~!@#$%^&*-_+|;:',/?[]<>"
 fsymbol :: Parser Char
 fsymbol = oneOf "."
 
+cspace :: Parser Char
+cspace = oneOf " "
+
 identifier :: Parser String
 identifier = many1 $ letter <|> symbol <|> digit
+
+comment :: Parser String
+comment = many $ letter <|> symbol <|> fsymbol <|> digit <|> cspace
 
 filename :: Parser String
 filename = many1 $ letter <|> fsymbol <|> digit
@@ -81,12 +87,20 @@ parseReview = do
     f <- identifier
     return $ Review f
 
+parseComment :: Parser Command
+parseComment = do
+    comm <- string "--"
+    c <- comment
+    return $ Comment c
+    
+
 ---------------------------------------------------------------------
 parseLine :: Parser Command
 parseLine = parseDefine
          <|> parseExecute
          <|> parseImport
          <|> parseReview
+         <|> parseComment
 
 readLine :: String -> Failable Command
 readLine input = case parse parseLine "parser" input of
