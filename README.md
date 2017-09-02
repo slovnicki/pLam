@@ -2,7 +2,7 @@
 (on the way to become fun programming language)
 
 ## Prerequisites
-This project builds using Haskell tool stack.
+This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
 
 ## Install
 On most Unix systems, you can get stack by typing:
@@ -24,14 +24,21 @@ git clone https://github.com/sandrolovnicki/lambda-calculus-interpreter.git
 ```
 cd lambda-calculus-interpreter
 ```
-3. use stack to build project:
+3. setup stack on isolated location
+```
+stack setup
+```
+4. use stack to build project:
 ```
 stack build
 ```
-4. use stack to run project executable
+5. use stack to run project executable
 ```
 stack exec lci
 ```
+
+## Examples
+(coming soon...)
 
 
 
