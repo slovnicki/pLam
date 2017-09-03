@@ -37,22 +37,30 @@ stack build
 stack exec lci
 ```
 
-## Examples
-(coming soon...)
-
-
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
+## Examples:
+# Fun with booleans
+```
+LCI> import booleans.txt
+- imported all from "booleans.txt"
+LCI> define id = \x.x
+LCI> -- this is a comment line
+LCI> execute foo
+Undeclared variable "foo"
+Try typing
+ define "foo" = <lambda expression>
+to define it before use
+LCI> review all
+ENVIRONMENT:
+   "id" = λx.x
+   "or" = λx.λy.((x true) y)
+   "and" = λx.λy.((x y) false)
+   "not" = λx.((x false) true)
+   "false" = λx.λy.y
+   "true" = λx.λy.x
+LCI> execute (id (or false (not true)))
+----- result        : λx.λy.y
+----- defined as    : "false"
+----- natural number: none
+LCI>
+```
+more complex examples are coming soon, after I improve evaluation algorithms.
