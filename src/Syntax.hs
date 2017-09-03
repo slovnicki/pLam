@@ -36,7 +36,7 @@ data Error = SyntaxError ParseError
 
 instance Show Error where
     show (SyntaxError se)        = show se
-    show (UndeclaredVariable uv) = "Undeclared variable " ++ show uv ++ "\nTry typing\n define " ++ show uv ++ " = <lambda abstraction>\nto define it before use"
+    show (UndeclaredVariable uv) = "Undeclared variable " ++ show uv ++ "\nTry typing\n define " ++ show uv ++ " = <lambda expression>\nto define it before use"
     show (FatalError fe)         = show fe
 
 type Failable = Either Error
