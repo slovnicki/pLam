@@ -44,11 +44,11 @@ LCI> import booleans.txt
 - imported all from "booleans.txt"
 LCI> define id = \x.x
 LCI> -- this is a comment line
+LCI> -------------------------------------
 LCI> execute foo
-Undeclared variable "foo"
-Try typing
- define "foo" = <lambda expression>
-to define it before use
+ERROR: undeclared variable "foo"
+- type "review all" to see all environment variables you can use
+- type "define <variable name> = <lambda expression>" to add new variables to environment
 LCI> review all
 ENVIRONMENT:
    "id" = λx.x
@@ -57,10 +57,13 @@ ENVIRONMENT:
    "not" = λx.((x false) true)
    "false" = λx.λy.y
    "true" = λx.λy.x
-LCI> execute (id (or false (not true)))
+LCI> --------------------------------------
+LCI> define foo = id
+LCI> execute (foo (or false (not true)))
 ----- result        : λx.λy.y
 ----- defined as    : "false"
 ----- natural number: none
-LCI>
+LCI> :quit
+you@your-computer your/path/to/lambda-calculus-interpreter
 ```
 more complex examples are coming soon, after I improve evaluation algorithms.
