@@ -3,6 +3,11 @@ module Eval where
 import Control.Monad.State
 import Debug.Trace
 
+{-import Prelude hiding (null,filter,map,length,rem)
+import qualified Data.List as List
+import Data.Set hiding (fold)
+import Data.Tree-}
+
 import Syntax
 
 evaluateVariable :: Variable -> Program (Failable Expression)

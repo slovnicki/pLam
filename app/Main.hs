@@ -18,7 +18,7 @@ execAll lines env = foldl exec env lines  where
                 Comment c ->  env
 
 showGlobal :: (Variable, Expression) -> IO ()
-showGlobal (n, e) = putStrLn ("   " ++ show n ++ " = " ++ show e)
+showGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
 convertToName [] ex = "none"
@@ -26,6 +26,11 @@ convertToName ((v,e):rest) ex
     | e == ex   = show v
     | otherwise = convertToName rest ex
 
+reviewVariable :: Environment -> Variable -> String
+reviewVariable [] var = "none"
+reviewVariable ((v,e):rest) var
+    | v == var  = show e
+    | otherwise = reviewVariable rest var
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -39,7 +44,7 @@ execute line env =
                     let (res, env') = (evalDefine v e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f  -> putStr("")--putStrLn ("- added " ++ show f ++ " to environment as " ++ show v) 
+                        Right f  -> putStr("") 
                     return env'
                 Execute e -> do
                     let (res, env') = (evalE e) `runState` env
@@ -58,9 +63,9 @@ execute line env =
                 Review r -> do
                     case r of
                        "all" -> do
-                           putStrLn ("ENVIRONMENT:")
+                           putStrLn (" ENVIRONMENT:")
                            mapM_ showGlobal env
-                       -- otherwise lookup value
+                       otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
                 Comment c -> return env
                     
