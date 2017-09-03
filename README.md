@@ -38,7 +38,7 @@ stack exec lci
 ```
 
 ## Examples:
-# Fun with booleans
+### Fun with booleans
 ```
 LCI> import booleans.txt
 - imported all from "booleans.txt"
