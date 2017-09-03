@@ -1,0 +1,8 @@
+-------------------------------------
+--             BOLEANS             --
+-------------------------------------
+define true = \x y. x
+define false = \x y. y
+define not = \x. (x false true)
+define and = \x y. (x y false)
+define or = \x y. (x true y)
