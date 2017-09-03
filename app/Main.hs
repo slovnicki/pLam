@@ -20,6 +20,12 @@ execAll lines env = foldl exec env lines  where
 showGlobal :: (Variable, Expression) -> IO ()
 showGlobal (n, e) = putStrLn ("   " ++ show n ++ " = " ++ show e)
 
+convertToName :: Environment -> Expression -> String
+convertToName [] ex = "none"
+convertToName ((v,e):rest) ex 
+    | e == ex   = show v
+    | otherwise = convertToName rest ex
+
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -33,13 +39,16 @@ execute line env =
                     let (res, env') = (evalDefine v e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f -> putStrLn ("- added " ++ show f ++ " to environment as " ++ show v) 
+                        Right f  -> putStr("")--putStrLn ("- added " ++ show f ++ " to environment as " ++ show v) 
                     return env'
                 Execute e -> do
                     let (res, env') = (evalE e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f -> putStrLn ("----- result: " ++ show f)
+                        Right f -> do
+                            putStrLn ("----- result        : " ++ show f)
+                            putStrLn ("----- defined as    : " ++ convertToName env f)
+                            putStrLn ("----- natural number: none") -- TODO
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)
