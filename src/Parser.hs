@@ -3,6 +3,7 @@ module Parser where
 import Control.Monad.State
 import Text.Parsec hiding (State)
 import Debug.Trace
+import Data.Char
 
 import Syntax
 
@@ -10,10 +11,13 @@ import Syntax
 type Parser = Parsec String ()
 
 symbol :: Parser Char
-symbol = oneOf "`~!@#$%^&*-_+|;:',/?[]<>"
+symbol = oneOf "`~!@$%^&*-_+|;:',/?[]<>"
 
 fsymbol :: Parser Char
 fsymbol = oneOf "."
+
+num_symbol :: Parser Char
+num_symbol = oneOf "#"
 
 cspace :: Parser Char
 cspace = oneOf " "
@@ -22,11 +26,12 @@ identifier :: Parser String
 identifier = many1 $ letter <|> symbol <|> digit
 
 comment :: Parser String
-comment = many $ letter <|> symbol <|> fsymbol <|> digit <|> cspace
+comment = many $ letter <|> symbol <|> fsymbol <|> num_symbol <|> digit <|> cspace
 
 filename :: Parser String
 filename = many1 $ letter <|> fsymbol <|> digit
 
+-------------------------------------------------------------------------------------
 parseVariable :: Parser Expression
 parseVariable = liftM Variable $ identifier
 
@@ -49,10 +54,24 @@ parseApplication = do
 parseParens :: Parser Expression
 parseParens = between (char '(') (char ')') parseApplication
 
+--------------------------------
+fromNumber :: Int -> Expression -> Expression
+fromNumber 0 exp = Abstraction "f" (Abstraction "x" exp)
+fromNumber n exp = fromNumber (n-1) (Application (Variable "f") exp)
+
+parseChurch :: Parser Expression
+parseChurch = do
+    hash <- num_symbol
+    strNum <- many1 digit
+    let intNum = read strNum :: Int
+    return (fromNumber intNum (Variable "x"))
+--------------------------------
+
 parseExpression :: Parser Expression
 parseExpression = parseVariable 
                <|> parseAbstraction
                <|> parseParens
+               <|> parseChurch
 
 ----------------------------------------------------------------
 parseDefine :: Parser Command
