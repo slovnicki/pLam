@@ -21,7 +21,7 @@ instance Show Expression where
     show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
 
 data Command = Define LambdaVar Expression
-             | Execute Expression
+             | Execute String Expression
              | Import String
              | Review String
              | Comment String

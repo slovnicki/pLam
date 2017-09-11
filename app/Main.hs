@@ -33,8 +33,6 @@ reviewVariable ((v,e):rest) var
     | v == var  = show e
     | otherwise = reviewVariable rest var
 
-hasExpressionChanged :: Expression -> Expression -> Bool
-hasExpressionChanged e1 e2 = e1 == e2
 
 manualBeta :: Environment -> Expression -> Int -> IO ()
 manualBeta env exp num = do
@@ -52,8 +50,22 @@ manualBeta env exp num = do
             case (e2 == exp) of
                 True -> do
                     putStrLn ("-- fixed point reached!")
-                    manualBeta env e2 (num+1)
+                    putStrLn ("----- result        : " ++ show exp)
+                    putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
+                    putStrLn ("----- natural number: none") -- TODO
                 False -> manualBeta env e2 (num+1)
+
+loopBeta :: Environment -> Expression -> Int -> IO ()
+loopBeta env exp num = do
+    putStrLn ("-- " ++ show num ++ ": " ++ show exp)
+    let e2 = betaReduction exp
+    case (e2 == exp) of
+        True -> do
+            putStrLn ("-- fixed point reached!")
+            putStrLn ("----- result        : " ++ show exp)
+            putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
+            putStrLn ("----- natural number: none") -- TODO
+        False -> loopBeta env e2 (num+1)
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -67,20 +79,18 @@ execute line env =
                     let (res, env') = (evalDefine v e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f  -> do
-                            putStr ("")
-                            --putStrLn("- vars : " ++ show (vars f))
-                            --putStrLn("- free : " ++ show (freeVars f))
-                            --putStrLn("- bound: " ++ show (boundVars f)) 
+                        Right f  -> putStr("") 
                     return env'
-                Execute e -> do
+                Execute op e -> do
                     let (res, env') = (evalE e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
                         Right f -> do
-                            manualBeta env f 0
-                            --drawPossibleReductions res
-   
+                            case op of
+                                "manual" -> manualBeta env f 0
+                                "auto"   -> loopBeta env f 0
+                                "tree"   -> drawPossibleReductions f
+                                otherwise -> putStrLn (" ERROR: unknown option " ++ show op ++ "\n- available options for executions are:\n    manual\n    auto\n    tree")
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)

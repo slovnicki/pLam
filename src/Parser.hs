@@ -91,8 +91,10 @@ parseExecute :: Parser Command
 parseExecute = do
     comm <- string "execute"
     spaces
+    op <- many1 letter
+    spaces
     ex <- parseExpression
-    return $ Execute ex
+    return $ Execute op ex
 
 parseImport :: Parser Command
 parseImport = do
