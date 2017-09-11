@@ -37,7 +37,7 @@ freshVars n = fromList . getFreshN' n . toList where
 
   getFreshN' :: Int -> [LambdaVar] -> [LambdaVar]
   getFreshN' n []             = take n $ zipWith LambdaVar ['x'..] [0,1..]
-  getFreshN' n (v@(LambdaVar c _):vs) = 
+  getFreshN' n (v@(LambdaVar c _):vs) =
     let m = maximum $ 
             List.map index $ 
             List.filter ((==c) . name) 

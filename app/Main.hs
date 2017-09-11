@@ -18,7 +18,7 @@ execAll lines env = foldl exec env lines  where
                 Define v e -> snd $ (evalDefine v e) `runState` env
                 Comment c ->  env
 
-showGlobal :: (LambdaVar, Expression) -> IO ()
+showGlobal :: (String, Expression) -> IO ()
 showGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
@@ -27,7 +27,7 @@ convertToName ((v,e):rest) ex
     | alphaEquiv e ex = show v
     | otherwise            = convertToName rest ex
 
-reviewVariable :: Environment -> LambdaVar -> String
+reviewVariable :: Environment -> String -> String
 reviewVariable [] var = "none"
 reviewVariable ((v,e):rest) var
     | v == var  = show e
@@ -102,7 +102,7 @@ execute line env =
                        "all" -> do
                            putStrLn (" ENVIRONMENT:")
                            mapM_ showGlobal env
-                       otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env (LambdaVar (head r) 0))
+                       otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
                 Comment c -> return env
                     

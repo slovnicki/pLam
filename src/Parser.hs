@@ -11,7 +11,7 @@ import Syntax
 type Parser = Parsec String ()
 
 symbol :: Parser Char
-symbol = oneOf "`#~!@$%^&*-_+|;:',/?[]<>"
+symbol = oneOf "`#~@$%^&*-_+|;:',/?[]<>"
 
 fsymbol :: Parser Char
 fsymbol = oneOf "."
@@ -19,8 +19,8 @@ fsymbol = oneOf "."
 cspace :: Parser Char
 cspace = oneOf " "
 
-identifier :: Parser Char
-identifier = letter
+envIdentifier :: Parser String
+envIdentifier = many1 $ letter <|> symbol <|> digit
 
 comment :: Parser String
 comment = many $ letter <|> symbol <|> fsymbol <|> digit <|> cspace
@@ -34,10 +34,16 @@ parseVariable = do
     x <- letter
     return (Variable (LambdaVar x 0))  
 
+parseEnvironmentVar :: Parser Expression
+parseEnvironmentVar = do
+    char '!'
+    ev <- envIdentifier
+    return (EnvironmentVar ev)
+
 parseAbstraction :: Parser Expression
 parseAbstraction = do
   char '\\'
-  xs <- identifier `endBy1` spaces
+  xs <- letter `endBy1` spaces
   char '.'
   spaces
   body <- parseApplication
@@ -70,18 +76,21 @@ parseExpression = parseVariable
                <|> parseAbstraction
                <|> parseParens
                <|> parseChurch
+               <|> parseEnvironmentVar
 
 ----------------------------------------------------------------
 parseDefine :: Parser Command
 parseDefine = do
     comm <- string "define"
     spaces
-    var <- identifier
+    char '!'
+    spaces
+    var <- envIdentifier
     spaces
     char '='
     spaces
     y <- parseExpression
-    return $ Define (LambdaVar var 0) y
+    return $ Define var y
 
 parseExecute :: Parser Command
 parseExecute = do
@@ -103,7 +112,7 @@ parseReview :: Parser Command
 parseReview = do
     comm <- string "review"
     spaces
-    f <- many1 letter
+    f <- envIdentifier
     return $ Review f
 
 parseComment :: Parser Command

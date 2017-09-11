@@ -17,14 +17,16 @@ instance Show LambdaVar where
 data Expression = Variable LambdaVar
                 | Abstraction LambdaVar Expression
                 | Application Expression Expression
+                | EnvironmentVar String
                 deriving (Ord,Eq)
 
 instance Show Expression where
     show (Variable v)        = show v
     show (Abstraction n t)   = "λ" ++ show n ++ "." ++ show t
     show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
+    show (EnvironmentVar ev)         = ev
 
-data Command = Define LambdaVar Expression
+data Command = Define String Expression
              | Execute String Expression
              | Import String
              | Review String
@@ -35,12 +37,12 @@ data LCILine = Command Command
              | Expression Expression
              deriving (Eq, Show)
 
-type Environment = [(LambdaVar, Expression)]
+type Environment = [(String, Expression)]
 
 type Program = State Environment
 
 data Error = SyntaxError ParseError
-           | UndeclaredVariable LambdaVar
+           | UndeclaredVariable String
            | FatalError String
 
 instance Show Error where
