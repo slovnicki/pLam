@@ -11,13 +11,10 @@ import Syntax
 type Parser = Parsec String ()
 
 symbol :: Parser Char
-symbol = oneOf "`~!@$%^&*-_+|;:',/?[]<>"
+symbol = oneOf "`#~!@$%^&*-_+|;:',/?[]<>"
 
 fsymbol :: Parser Char
 fsymbol = oneOf "."
-
-num_symbol :: Parser Char
-num_symbol = oneOf "#"
 
 cspace :: Parser Char
 cspace = oneOf " "
@@ -26,7 +23,7 @@ identifier :: Parser Char
 identifier = letter
 
 comment :: Parser String
-comment = many $ letter <|> symbol <|> fsymbol <|> num_symbol <|> digit <|> cspace
+comment = many $ letter <|> symbol <|> fsymbol <|> digit <|> cspace
 
 filename :: Parser String
 filename = many1 $ letter <|> fsymbol <|> digit
@@ -63,7 +60,6 @@ fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) ex
 
 parseChurch :: Parser Expression
 parseChurch = do
-    hash <- num_symbol
     strNum <- many1 digit
     let intNum = read strNum :: Int
     return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
