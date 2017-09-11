@@ -1,6 +1,7 @@
 import Syntax
 import Parser
 import Eval
+import Reductions
 
 import Control.Monad.State
 import System.IO (hFlush, stdout)
@@ -11,26 +12,48 @@ import System.Exit
 execAll :: [String] -> Environment -> Environment
 execAll lines env = foldl exec env lines  where
     exec env line = case readExpr line of
-        (Left err) -> env
-        (Right ex) -> do
+        Left err -> trace ("-- " ++ show err) (env)
+        Right ex -> do
             case ex of
                 Define v e -> snd $ (evalDefine v e) `runState` env
                 Comment c ->  env
 
-showGlobal :: (Variable, Expression) -> IO ()
+showGlobal :: (LambdaVar, Expression) -> IO ()
 showGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
 convertToName [] ex = "none"
 convertToName ((v,e):rest) ex 
-    | e == ex   = show v
-    | otherwise = convertToName rest ex
+    | alphaEquiv e ex = show v
+    | otherwise            = convertToName rest ex
 
-reviewVariable :: Environment -> Variable -> String
+reviewVariable :: Environment -> LambdaVar -> String
 reviewVariable [] var = "none"
 reviewVariable ((v,e):rest) var
     | v == var  = show e
     | otherwise = reviewVariable rest var
+
+hasExpressionChanged :: Expression -> Expression -> Bool
+hasExpressionChanged e1 e2 = e1 == e2
+
+manualBeta :: Environment -> Expression -> Int -> IO ()
+manualBeta env exp num = do
+    putStrLn ("-- " ++ show num ++ ": " ++ show exp)
+    putStrLn ("Continue? [Y/n]") 
+    hFlush stdout
+    line <- getLine
+    case line of
+        "n" -> do
+            putStrLn ("----- result        : " ++ show exp)
+            putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
+            putStrLn ("----- natural number: none") -- TODO
+        otherwise -> do
+            let e2 = betaReduction exp
+            case (e2 == exp) of
+                True -> do
+                    putStrLn ("-- fixed point reached!")
+                    manualBeta env e2 (num+1)
+                False -> manualBeta env e2 (num+1)
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -44,16 +67,20 @@ execute line env =
                     let (res, env') = (evalDefine v e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f  -> putStr("") 
+                        Right f  -> do
+                            putStr ("")
+                            --putStrLn("- vars : " ++ show (vars f))
+                            --putStrLn("- free : " ++ show (freeVars f))
+                            --putStrLn("- bound: " ++ show (boundVars f)) 
                     return env'
                 Execute e -> do
                     let (res, env') = (evalE e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
                         Right f -> do
-                            putStrLn ("----- result        : " ++ show f)
-                            putStrLn ("----- defined as    : " ++ convertToName env f)
-                            putStrLn ("----- natural number: none") -- TODO
+                            manualBeta env f 0
+                            --drawPossibleReductions res
+   
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)
@@ -65,7 +92,7 @@ execute line env =
                        "all" -> do
                            putStrLn (" ENVIRONMENT:")
                            mapM_ showGlobal env
-                       otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
+                       otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env (LambdaVar (head r) 0))
                     return env
                 Comment c -> return env
                     

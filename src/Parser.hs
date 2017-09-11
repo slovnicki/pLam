@@ -22,8 +22,8 @@ num_symbol = oneOf "#"
 cspace :: Parser Char
 cspace = oneOf " "
 
-identifier :: Parser String
-identifier = many1 $ letter <|> symbol <|> digit
+identifier :: Parser Char
+identifier = letter
 
 comment :: Parser String
 comment = many $ letter <|> symbol <|> fsymbol <|> num_symbol <|> digit <|> cspace
@@ -33,7 +33,9 @@ filename = many1 $ letter <|> fsymbol <|> digit
 
 -------------------------------------------------------------------------------------
 parseVariable :: Parser Expression
-parseVariable = liftM Variable $ identifier
+parseVariable = do
+    x <- letter
+    return (Variable (LambdaVar x 0))  
 
 parseAbstraction :: Parser Expression
 parseAbstraction = do
@@ -43,7 +45,7 @@ parseAbstraction = do
   spaces
   body <- parseApplication
   return $ curry xs body where
-        curry (x:xs) body = Abstraction x $ curry xs body
+        curry (x:xs) body = Abstraction (LambdaVar x 0) $ curry xs body
         curry [] body     = body
 
 parseApplication :: Parser Expression
@@ -56,15 +58,15 @@ parseParens = between (char '(') (char ')') parseApplication
 
 --------------------------------
 fromNumber :: Int -> Expression -> Expression
-fromNumber 0 exp = Abstraction "f" (Abstraction "x" exp)
-fromNumber n exp = fromNumber (n-1) (Application (Variable "f") exp)
+fromNumber 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
+fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
 
 parseChurch :: Parser Expression
 parseChurch = do
     hash <- num_symbol
     strNum <- many1 digit
     let intNum = read strNum :: Int
-    return (fromNumber intNum (Variable "x"))
+    return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
 --------------------------------
 
 parseExpression :: Parser Expression
@@ -83,7 +85,7 @@ parseDefine = do
     char '='
     spaces
     y <- parseExpression
-    return $ Define var y
+    return $ Define (LambdaVar var 0) y
 
 parseExecute :: Parser Command
 parseExecute = do
@@ -103,7 +105,7 @@ parseReview :: Parser Command
 parseReview = do
     comm <- string "review"
     spaces
-    f <- identifier
+    f <- many1 letter
     return $ Review f
 
 parseComment :: Parser Command

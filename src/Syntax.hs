@@ -3,19 +3,24 @@ module Syntax where
 import Control.Monad.State
 import Text.Parsec hiding (State)
 
-type Variable = String
+data LambdaVar = LambdaVar { name :: Char
+                           , index :: Int
+                           } deriving (Ord,Eq)
+instance Show LambdaVar where
+  show (LambdaVar c 0) = id (show c)
+  show (LambdaVar c i) = id (show c ++ show i)
 
-data Expression = Variable Variable
-                | Abstraction Variable Expression
+data Expression = Variable LambdaVar
+                | Abstraction LambdaVar Expression
                 | Application Expression Expression
-                deriving (Eq)
+                deriving (Ord,Eq)
 
 instance Show Expression where
-    show (Variable v)        = v
-    show (Abstraction n t)   = "λ" ++ n ++ "." ++ show t
+    show (Variable v)        = show v
+    show (Abstraction n t)   = "λ" ++ show n ++ "." ++ show t
     show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
 
-data Command = Define Variable Expression
+data Command = Define LambdaVar Expression
              | Execute Expression
              | Import String
              | Review String
@@ -26,12 +31,12 @@ data LCILine = Command Command
              | Expression Expression
              deriving (Eq, Show)
 
-type Environment = [(Variable, Expression)]
+type Environment = [(LambdaVar, Expression)]
 
 type Program = State Environment
 
 data Error = SyntaxError ParseError
-           | UndeclaredVariable Variable
+           | UndeclaredVariable LambdaVar
            | FatalError String
 
 instance Show Error where
