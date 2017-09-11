@@ -6,9 +6,13 @@ import Text.Parsec hiding (State)
 data LambdaVar = LambdaVar { name :: Char
                            , index :: Int
                            } deriving (Ord,Eq)
+
+showHelper :: Int -> String
+showHelper 0 = ""
+showHelper n = "'" ++ showHelper (n-1)
 instance Show LambdaVar where
-  show (LambdaVar c 0) = id (show c)
-  show (LambdaVar c i) = id (show c ++ show i)
+  show (LambdaVar c 0) = [c]
+  show (LambdaVar c i) = [c] ++ showHelper i
 
 data Expression = Variable LambdaVar
                 | Abstraction LambdaVar Expression
