@@ -6,3 +6,4 @@ define !false = \x y. y
 define !not = \x. (x !false !true)
 define !and = \x y. (x y !false)
 define !or = \x y. (x !true y)
+define !xor = \x y. x (!not y) y
