@@ -44,7 +44,7 @@ manualBeta env exp num = do
         "n" -> do
             putStrLn ("----- result        : " ++ show exp)
             putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
+            putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
         otherwise -> do
             let e2 = betaReduction exp
             case (e2 == exp || num>1000) of
@@ -54,7 +54,7 @@ manualBeta env exp num = do
                         False -> putStrLn ("-- fixed point reached!")
                     putStrLn ("----- result        : " ++ show exp)
                     putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-                    putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
+                    putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
                 False -> manualBeta env e2 (num+1)
 
 loopBeta :: Environment -> Expression -> Int -> IO ()
@@ -69,7 +69,7 @@ loopBeta env exp num = do
             putStrLn ("-- fixed point reached!")
             putStrLn ("----- result        : " ++ show exp)
             putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
+            putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
         False -> loopBeta env e2 (num+1)
 
 id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
@@ -77,12 +77,15 @@ id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
 findNumeral :: Expression -> Expression -> Int -> String
 findNumeral exp id num = do
     let e2 = betaReduction exp
-    case (e2 == id) of
+    case (e2 == exp) of
         True -> show num
         False -> do
-            case num>1000 of
-                True -> "none" 
-                False -> findNumeral e2 id (num+1) 
+            case (e2 == id) of
+                True -> show num
+                False -> do
+                    case num>1000 of
+                        True -> "none" 
+                        False -> findNumeral e2 id (num+1)
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -107,7 +110,7 @@ execute line env =
                                 "manual" -> manualBeta env f 0
                                 "auto"   -> loopBeta env f 0
                                 "tree"   -> drawPossibleReductions f
-                                otherwise -> putStrLn (" ERROR: unknown option " ++ show op ++ "\n- available options for executions are:\n    manual\n    auto\n    tree")
+                                otherwise -> putStrLn (" ERROR: unknown execute option " ++ show op ++ "\n- available options for execution are:\n    manual\n    auto\n    tree")
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)
