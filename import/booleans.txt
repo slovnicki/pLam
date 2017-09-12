@@ -1,8 +1,8 @@
 -------------------------------------
 --             BOLEANS             --
 -------------------------------------
-define t = \x y. x
-define f = \x y. y
-define n = \x. (x f t)
-define a = \x y. (x y f)
-define o = \x y. (x t y)
+define !true = \x y. x
+define !false = \x y. y
+define !not = \x. (x !false !true)
+define !and = \x y. (x y !false)
+define !or = \x y. (x !true y)

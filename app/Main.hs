@@ -44,28 +44,45 @@ manualBeta env exp num = do
         "n" -> do
             putStrLn ("----- result        : " ++ show exp)
             putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- natural number: none") -- TODO
+            putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
         otherwise -> do
             let e2 = betaReduction exp
-            case (e2 == exp) of
+            case (e2 == exp || num>1000) of
                 True -> do
-                    putStrLn ("-- fixed point reached!")
+                    case num>1000 of
+                        True  -> putStrLn ("-- 1000 reductions limit!") 
+                        False -> putStrLn ("-- fixed point reached!")
                     putStrLn ("----- result        : " ++ show exp)
                     putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-                    putStrLn ("----- natural number: none") -- TODO
+                    putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
                 False -> manualBeta env e2 (num+1)
 
 loopBeta :: Environment -> Expression -> Int -> IO ()
 loopBeta env exp num = do
     putStrLn ("-- " ++ show num ++ ": " ++ show exp)
     let e2 = betaReduction exp
-    case (e2 == exp) of
+    case (e2 == exp || num>1000) of
         True -> do
+            case num>1000 of
+                True  -> putStrLn ("-- 1000 reductions limit!") 
+                False -> putStrLn ("-- fixed point reached!")
             putStrLn ("-- fixed point reached!")
             putStrLn ("----- result        : " ++ show exp)
             putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- natural number: none") -- TODO
+            putStrLn ("----- natural number: " ++ findNumeral (Application exp id') id' 0)
         False -> loopBeta env e2 (num+1)
+
+id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
+
+findNumeral :: Expression -> Expression -> Int -> String
+findNumeral exp id num = do
+    let e2 = betaReduction exp
+    case (e2 == id) of
+        True -> show num
+        False -> do
+            case num>1000 of
+                True -> "none" 
+                False -> findNumeral e2 id (num+1) 
 
 execute :: String -> Environment -> IO Environment
 execute line env =
