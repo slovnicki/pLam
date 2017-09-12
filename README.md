@@ -74,7 +74,7 @@ LCI> execute (!foo (!or !false (!not !true)))
 -- fixed point reached!
 ----- result        : λx.λy.y
 ----- α-equivalent  : "false"
------ natural number: none
+----- Church numeral: 0
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
@@ -117,7 +117,7 @@ Continue? [Y/n]
 -- fixed point reached!
 ----- result        : λf.λx.(f (f x))
 ----- α-equivalent  : none
------ natural number: 2
+----- Church numeral: 2
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
