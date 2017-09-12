@@ -134,3 +134,24 @@ LCI> execute tree ((\f x. f x) (\f x. f x))
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
+
+### Factorial
+```
+LCI> import booleans.txt
+- imported all from "booleans.txt"
+LCI> import arithmetic.txt
+- imported all from "arithmetic.txt"
+LCI> define !Y = \f. (\x. f(x x)) (\x. f(x x))
+LCI> define !fact = (!Y (\f n. !if (!isZero n) 1 (!mult n (f (!pred n)))))
+LCI> execute auto (!fact 3)
+...
+...
+...
+-- (after 694 steps)
+-- fixed point reached!
+----- result        : λf.λx.(f (f (f (f (f (f x))))))
+----- α-equivalent  : none
+----- Church numeral: 6
+LCI> :quit
+you@your-computer your/path/to/lambda-calculus-interpreter
+```
