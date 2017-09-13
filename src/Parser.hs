@@ -92,8 +92,6 @@ parseDefine = do
 
 parseExecute :: Parser Command
 parseExecute = do
-    comm <- string "execute"
-    spaces
     op <- many1 letter
     spaces
     ex <- parseExpression
