@@ -81,8 +81,6 @@ parseExpression = parseVariable
 ----------------------------------------------------------------
 parseDefine :: Parser Command
 parseDefine = do
-    comm <- string "define"
-    spaces
     char '!'
     spaces
     var <- envIdentifier
