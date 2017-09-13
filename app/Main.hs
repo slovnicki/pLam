@@ -33,6 +33,27 @@ reviewVariable ((v,e):rest) var
     | v == var  = show e
     | otherwise = reviewVariable rest var
 
+id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
+
+findNumeral :: Expression -> Int -> String
+findNumeral exp num = do
+    let e2 = betaReduction exp
+    case (alphaEquiv e2 id') of
+        True -> show num
+        False -> do
+            case num>100 of
+                True -> "none"
+                False -> do
+                    case (hasBetaRedex e2) of
+                        True -> findNumeral e2 (num+1)
+                        False -> "none" 
+
+showResult :: Environment -> Expression -> IO ()
+showResult env exp = do
+    putStrLn ("----- result        : " ++ show exp)
+    putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
+    putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') 0)
+    
 
 manualBeta :: Environment -> Expression -> Int -> IO ()
 manualBeta env exp num = do
@@ -41,51 +62,31 @@ manualBeta env exp num = do
     hFlush stdout
     line <- getLine
     case line of
-        "n" -> do
-            putStrLn ("----- result        : " ++ show exp)
-            putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
+        "n" -> showResult env exp
         otherwise -> do
             let e2 = betaReduction exp
-            case (e2 == exp || num>1000) of
-                True -> do
-                    case num>1000 of
-                        True  -> putStrLn ("-- 1000 reductions limit!") 
-                        False -> putStrLn ("-- fixed point reached!")
-                    putStrLn ("----- result        : " ++ show exp)
-                    putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-                    putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
-                False -> manualBeta env e2 (num+1)
+            case (hasBetaRedex exp) of
+                True -> manualBeta env e2 (num+1)
+                False -> do
+                    putStrLn ("-- no beta redexes!")
+                    manualBeta env e2 (num+1)
 
 loopBeta :: Environment -> Expression -> Int -> IO ()
 loopBeta env exp num = do
     putStrLn ("-- " ++ show num ++ ": " ++ show exp)
-    let e2 = betaReduction exp
-    case (e2 == exp || num>1000) of
+    case (hasBetaRedex exp) of
         True -> do
             case num>1000 of
-                True  -> putStrLn ("-- 1000 reductions limit!") 
-                False -> putStrLn ("-- fixed point reached!")
-            putStrLn ("-- fixed point reached!")
-            putStrLn ("----- result        : " ++ show exp)
-            putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-            putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') id' 0)
-        False -> loopBeta env e2 (num+1)
-
-id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
-
-findNumeral :: Expression -> Expression -> Int -> String
-findNumeral exp id num = do
-    let e2 = betaReduction exp
-    case (e2 == exp) of
-        True -> show num
-        False -> do
-            case (e2 == id) of
-                True -> show num
+                True  -> do 
+                    putStrLn ("-- 1000 reductions limit!")
+                    showResult env exp
                 False -> do
-                    case num>1000 of
-                        True -> "none" 
-                        False -> findNumeral e2 id (num+1)
+                    let e2 = betaReduction exp
+                    loopBeta env e2 (num+1)
+        False -> do
+            putStrLn ("-- no beta redexes!") 
+            showResult env exp
+
 
 execute :: String -> Environment -> IO Environment
 execute line env =
