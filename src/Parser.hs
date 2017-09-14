@@ -5,46 +5,71 @@ import Text.Parsec hiding (State)
 import Debug.Trace
 import Data.Char
 
+import qualified Text.Parsec.Token as Token
+import Text.Parsec.Language
+
 import Syntax
 
+-------------------------------------------------------------------------------------
+languageDef =
+    emptyDef { Token.commentLine     = "--"
+             , Token.identStart      = letter
+             , Token.identLetter     = alphaNum
+             , Token.reservedNames   = [ "execute"
+                                       , "import"
+                                       , "review"
+                                       ]
+             , Token.reservedOpNames = [ "="
+                                       , "." 
+                                       , "\\"
+                                       ]
+             }
+
+lexer = Token.makeTokenParser languageDef
+
+identifier = Token.identifier lexer
+reserved   = Token.reserved   lexer 
+reservedOp = Token.reservedOp lexer 
+parens     = Token.parens     lexer
+-------------------------------------------------------------------------------------
 
 type Parser = Parsec String ()
 
+-------------------------------------------------------------------------------------
 symbol :: Parser Char
-symbol = oneOf "`#~@$%^&*-_+|;:',/?[]<>"
-
-fsymbol :: Parser Char
-fsymbol = oneOf "."
-
-cspace :: Parser Char
-cspace = oneOf " "
-
-envIdentifier :: Parser String
-envIdentifier = many1 $ letter <|> symbol <|> digit
+symbol = oneOf ".`#~@$%^&*_+|;:',/?[]<> "
 
 comment :: Parser String
-comment = many $ letter <|> symbol <|> fsymbol <|> digit <|> cspace
+comment = many $ letter <|> symbol <|> digit
 
 filename :: Parser String
-filename = many1 $ letter <|> fsymbol <|> digit
+filename = many1 $ letter <|> symbol <|> digit
+
+fromNumber :: Int -> Expression -> Expression
+fromNumber 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
+fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
+-------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
+parseChurch :: Parser Expression
+parseChurch = do
+    strNum <- many1 digit
+    let intNum = read strNum :: Int
+    return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
+
 parseVariable :: Parser Expression
 parseVariable = do
-    x <- letter
-    return (Variable (LambdaVar x 0))  
-
-parseEnvironmentVar :: Parser Expression
-parseEnvironmentVar = do
-    char '!'
-    ev <- envIdentifier
-    return (EnvironmentVar ev)
+    x <- identifier
+    spaces
+    case (length x) of
+        1 -> return (Variable (LambdaVar (head x) 0))
+        otherwise -> return (EnvironmentVar x) 
 
 parseAbstraction :: Parser Expression
 parseAbstraction = do
-  char '\\'
+  reservedOp "\\"
   xs <- letter `endBy1` spaces
-  char '.'
+  reservedOp "."
   spaces
   body <- parseApplication
   return $ curry xs body where
@@ -56,59 +81,42 @@ parseApplication = do
   es <- parseExpression `sepBy1` spaces
   return $ foldl1 Application es
 
-parseParens :: Parser Expression
-parseParens = between (char '(') (char ')') parseApplication
-
---------------------------------
-fromNumber :: Int -> Expression -> Expression
-fromNumber 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
-fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
-
-parseChurch :: Parser Expression
-parseChurch = do
-    strNum <- many1 digit
-    let intNum = read strNum :: Int
-    return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
---------------------------------
-
 parseExpression :: Parser Expression
-parseExpression = parseVariable 
-               <|> parseAbstraction
-               <|> parseParens
+parseExpression =  parens parseApplication
                <|> parseChurch
-               <|> parseEnvironmentVar
+               <|> parseVariable
+               <|> parseAbstraction
+-------------------------------------------------------------------------------------
 
-----------------------------------------------------------------
+-------------------------------------------------------------------------------------
 parseDefine :: Parser Command
 parseDefine = do
-    char '!'
+    var <- identifier
     spaces
-    var <- envIdentifier
-    spaces
-    char '='
+    reservedOp "="
     spaces
     y <- parseExpression
     return $ Define var y
 
 parseExecute :: Parser Command
 parseExecute = do
-    op <- many1 letter
+    reserved "execute"
     spaces
     ex <- parseExpression
-    return $ Execute op ex
+    return $ Execute ex
 
 parseImport :: Parser Command
 parseImport = do
-    comm <- string "import"
+    reserved "import"
     spaces
     f <- filename
     return $ Import f
 
 parseReview :: Parser Command
 parseReview = do
-    comm <- string "review"
+    reserved "review"
     spaces
-    f <- envIdentifier
+    f <- identifier
     return $ Review f
 
 parseComment :: Parser Command
@@ -117,20 +125,17 @@ parseComment = do
     c <- comment
     return $ Comment c
     
-
----------------------------------------------------------------------
 parseLine :: Parser Command
 parseLine = parseDefine
          <|> parseExecute
          <|> parseImport
          <|> parseReview
          <|> parseComment
+-------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------
 readLine :: String -> Failable Command
 readLine input = case parse parseLine "parser" input of
     Left err -> Left $ SyntaxError err
     Right l -> Right l 
-    
-readExpr :: String -> Failable Command
-readExpr input = readLine input
 

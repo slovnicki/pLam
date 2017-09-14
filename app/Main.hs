@@ -11,7 +11,7 @@ import System.Exit
 
 execAll :: [String] -> Environment -> Environment
 execAll lines env = foldl exec env lines  where
-    exec env line = case readExpr line of
+    exec env line = case readLine line of
         Left err -> trace ("-- " ++ show err) (env)
         Right ex -> do
             case ex of
@@ -68,7 +68,7 @@ manualBeta env exp num = do
             case (hasBetaRedex exp) of
                 True -> manualBeta env e2 (num+1)
                 False -> do
-                    putStrLn ("-- no beta redexes!")
+                    putStrLn ("--- no beta redexes!")
                     manualBeta env e2 (num+1)
 
 loopBeta :: Environment -> Expression -> Int -> IO ()
@@ -78,13 +78,13 @@ loopBeta env exp num = do
         True -> do
             case num>1000 of
                 True  -> do 
-                    putStrLn ("-- 1000 reductions limit!")
+                    putStrLn ("--- 1000 reductions limit!")
                     showResult env exp
                 False -> do
                     let e2 = betaReduction exp
                     loopBeta env e2 (num+1)
         False -> do
-            putStrLn ("-- no beta redexes!") 
+            putStrLn ("--- no beta redexes!") 
             showResult env exp
 
 
@@ -102,21 +102,23 @@ execute line env =
                         Left err -> putStrLn $ show err
                         Right f  -> putStr("") 
                     return env'
-                Execute op e -> do
+                Execute e -> do
                     let (res, env') = (evalE e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
                         Right f -> do
+                            putStr ("- type reduction option (a-auto, m-manual, t-tree): ") 
+                            hFlush stdout
+                            op <- getLine
                             case op of
-                                "manual" -> manualBeta env f 0
-                                "auto"   -> loopBeta env f 0
-                                "tree"   -> drawPossibleReductions f
-                                otherwise -> putStrLn (" ERROR: unknown execute option " ++ show op ++ "\n- available options for execution are:\n    manual\n    auto\n    tree")
+                                "a"   -> loopBeta env f 0
+                                "m" -> manualBeta env f 0
+                                "t"   -> drawPossibleReductions f
+                                otherwise -> putStrLn (" ERROR: unknown execute option " ++ show op ++ "\n- available options for execution are:\n    a\n    m\n    t")
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)
                     let exprs = lines contents
-                    putStrLn ("- imported all from " ++ show f)
                     return $ execAll exprs env
                 Review r -> do
                     case r of

@@ -27,7 +27,7 @@ instance Show Expression where
     show (EnvironmentVar ev)         = ev
 
 data Command = Define String Expression
-             | Execute String Expression
+             | Execute Expression
              | Import String
              | Review String
              | Comment String
