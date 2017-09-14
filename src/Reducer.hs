@@ -1,4 +1,4 @@
-module Reductions where
+module Reducer where
 
 import Control.Monad.State
 import Debug.Trace

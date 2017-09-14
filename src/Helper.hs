@@ -1,7 +1,7 @@
 module Helper where
 
 import Syntax
-import Reductions
+import Reducer
 
 import Control.Monad.State
 import System.IO (hFlush, stdout)

@@ -1,7 +1,7 @@
 import Syntax
 import Parser
 import Evaluator
-import Reductions
+import Reducer
 import Helper
 
 import Control.Monad.State
