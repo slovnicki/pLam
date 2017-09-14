@@ -12,7 +12,7 @@ import Syntax
 
 
 -- a catamorphism for lambda terms
---      lambda                  app              lvar
+--      lambda                   app              lvar
 fold :: (LambdaVar -> a -> a) -> (a -> a -> a) -> (LambdaVar -> a) -> Expression -> a
 fold _ _ h (Variable v)     = h v
 fold f g h (Abstraction v e) = f v (fold f g h e) 
