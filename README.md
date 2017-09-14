@@ -41,11 +41,10 @@ stack exec lci
 ### Fun with booleans
 ```
 LCI> import booleans.txt
-- imported all from "booleans.txt"
-LCI> define !id = \x.x
+LCI> id = \x.x
 LCI> -- this is a comment line
 LCI> -------------------------------------
-LCI> execute auto !foo
+LCI> execute foo
 ERROR: undeclared variable "foo"
 - type "review all" to see all environment variables you can use
 - type "define <variable name> = <lambda expression>" to add new variables to environment
@@ -53,14 +52,15 @@ LCI> review all
  ENVIRONMENT:
 --- "id" = λx.x
 --- "xor" = λx.λy.((x (λx.((x λx.λy.y) λx.λy.x) y)) y)
---- "or" = λx.λy.((x true) y)
---- "and" = λx.λy.((x y) false)
---- "not" = λx.((x false) true)
+--- "or" = λx.λy.((x λx.λy.x) y)
+--- "and" = λx.λy.((x y) λx.λy.y)
+--- "not" = λx.((x λx.λy.y) λx.λy.x)
 --- "false" = λx.λy.y
 --- "true" = λx.λy.x
 LCI> --------------------------------------
-LCI> define !foo = !id
-LCI> execute (!foo (!or !false (!not !true)))
+LCI> foo = id
+LCI> execute (foo (or false (not true)))
+- type reduction option (a-auto, m-manual, t-tree): a
 -- 0: (λx.x ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x)))
 -- 1: ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
 -- 2: (λy.((λx.λy.y λx.λy.x) y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
@@ -70,8 +70,7 @@ LCI> execute (!foo (!or !false (!not !true)))
 -- 6: ((λx.λy.x λx.λy.y) λx.λy.x)
 -- 7: (λy.λx.λy.y λx.λy.x)
 -- 8: λx.λy.y
--- fixed point reached!
--- fixed point reached!
+--- no beta redexes!
 ----- result        : λx.λy.y
 ----- α-equivalent  : "false"
 ----- Church numeral: 0
@@ -82,8 +81,8 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ### Fun with arithmetic
 ```
 LCI> import arithmetic.txt
-- imported all from "arithmetic.txt"
-LCI> execute manual (!succ (!plus 0 1))
+LCI> execute (succ (plus 0 1))
+- type reduction option (a-auto, m-manual, t-tree): m
 -- 0: (λn.λf.λx.(f ((n f) x)) ((λm.λn.λf.λx.((m f) ((n f) x)) λf.λx.x) λf.λx.(f x)))
 Continue? [Y/n]
 
@@ -114,7 +113,10 @@ Continue? [Y/n]
 -- 9: λf.λx.(f (f x))
 Continue? [Y/n]
 
--- fixed point reached!
+--- no beta redexes!
+-- 10: λf.λx.(f (f x))
+Continue? [Y/n]
+n
 ----- result        : λf.λx.(f (f x))
 ----- α-equivalent  : none
 ----- Church numeral: 2
@@ -124,7 +126,8 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Renaming
 ```
-LCI> execute tree ((\f x. f x) (\f x. f x))
+LCI> execute ((\f x. f x) (\f x. f x))
+- type reduction option (a-auto, m-manual, t-tree): t
 (λf.λx.(f x) λf.λx.(f x))
 |
 `- λx.(λf.λx.(f x) x)
@@ -138,17 +141,16 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ### Factorial
 ```
 LCI> import booleans.txt
-- imported all from "booleans.txt"
 LCI> import arithmetic.txt
-- imported all from "arithmetic.txt"
-LCI> define !Y = \f. (\x. f(x x)) (\x. f(x x))
-LCI> define !fact = (!Y (\f n. !if (!isZero n) 1 (!mult n (f (!pred n)))))
-LCI> execute auto (!fact 3)
+LCI> Y = \f. (\x. f(x x)) (\x. f(x x))
+LCI> fact = (Y (\f n. if (isZero n) 1 (mult n (f (pred n)))))
+LCI> execute (fact 3)
+- type reduction option (a-auto, m-manual, t-tree): a
 ...
 ...
 ...
--- (after 694 steps)
--- fixed point reached!
+    (after 694 steps)
+--- no beta redexes!
 ----- result        : λf.λx.(f (f (f (f (f (f x))))))
 ----- α-equivalent  : none
 ----- Church numeral: 6
