@@ -60,7 +60,7 @@ LCI> review all
 LCI> --------------------------------------
 LCI> foo = id
 LCI> execute (foo (or false (not true)))
-- type reduction option (a-auto, m-manual, t-tree): a
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
 -- 0: (λx.x ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x)))
 -- 1: ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
 -- 2: (λy.((λx.λy.y λx.λy.x) y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
@@ -82,7 +82,7 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ```
 LCI> import arithmetic.txt
 LCI> execute (succ (plus 0 1))
-- type reduction option (a-auto, m-manual, t-tree): m
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): m
 -- 0: (λn.λf.λx.(f ((n f) x)) ((λm.λn.λf.λx.((m f) ((n f) x)) λf.λx.x) λf.λx.(f x)))
 Continue? [Y/n]
 
@@ -127,7 +127,7 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ### Renaming
 ```
 LCI> execute ((\f x. f x) (\f x. f x))
-- type reduction option (a-auto, m-manual, t-tree): t
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): t
 (λf.λx.(f x) λf.λx.(f x))
 |
 `- λx.(λf.λx.(f x) x)
@@ -142,10 +142,11 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ```
 LCI> import booleans.txt
 LCI> import arithmetic.txt
+LCI> import predicates.txt
 LCI> Y = \f. (\x. f(x x)) (\x. f(x x))
 LCI> fact = (Y (\f n. if (isZero n) 1 (mult n (f (pred n)))))
 LCI> execute (fact 3)
-- type reduction option (a-auto, m-manual, t-tree): a
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
 ...
 ...
 ...
