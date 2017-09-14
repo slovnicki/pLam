@@ -1,6 +1,6 @@
 import Syntax
 import Parser
-import Eval
+import Evaluator
 import Reductions
 
 import Control.Monad.State
@@ -106,7 +106,7 @@ execute line env =
                         Right f  -> putStr("") 
                     return env'
                 Execute e -> do
-                    let (res, env') = (evalE e) `runState` env
+                    let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
                         Right f -> do

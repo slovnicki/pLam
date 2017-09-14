@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Parser Syntax Eval Reductions
+  exposed-modules:     Parser Syntax Evaluator Reductions
   build-depends:       base >= 4.7 && < 5
                      , parsec
                      , mtl
