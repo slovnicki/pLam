@@ -10,6 +10,7 @@ import Debug.Trace
 import System.Exit
 
 
+-------------------------------------------------------------------------------------
 execAll :: [String] -> Environment -> Environment
 execAll lines env = foldl exec env lines  where
     exec env line = case readLine line of
@@ -17,7 +18,7 @@ execAll lines env = foldl exec env lines  where
         Right ex -> do
             case ex of
                 Define v e -> snd $ (evalDefine v e) `runState` env
-                Comment c ->  env
+                otherwise  -> env
 
 execute :: String -> Environment -> IO Environment
 execute line env =

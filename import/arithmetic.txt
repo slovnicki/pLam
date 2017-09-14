@@ -7,7 +7,3 @@ mult = \m n f. m (n f)
 exp = \m n. n m
 pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
 minus = \m n. (n pred) m
-
-isZero = \n. n (\x. false) true
-leq = \m n. isZero (minus m n)
-eq = \m n. and (leq m n) (leq n m)

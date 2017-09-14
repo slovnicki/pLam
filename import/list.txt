@@ -1,0 +1,11 @@
+-------------------------------------
+--              LISTS              --
+-------------------------------------
+pair = \x y z. z x y
+first = \p. p true
+second = \p. p false
+nil = pair true true
+isnil = first
+cons = \h t. pair false (pair h t)
+head = \z. first (second z)
+tail = \z. second (second z)
