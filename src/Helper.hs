@@ -53,8 +53,8 @@ showResult env exp = do
     putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') 0)
     
 
-manualBeta :: Environment -> Expression -> Int -> IO ()
-manualBeta env exp num = do
+manualReduce :: Environment -> Expression -> Int -> IO ()
+manualReduce env exp num = do
     putStrLn ("-- " ++ show num ++ ": " ++ show exp)
     putStrLn ("Continue? [Y/n]") 
     hFlush stdout
@@ -64,13 +64,13 @@ manualBeta env exp num = do
         otherwise -> do
             let e2 = betaReduction exp
             case (hasBetaRedex exp) of
-                True -> manualBeta env e2 (num+1)
+                True -> manualReduce env e2 (num+1)
                 False -> do
                     putStrLn ("--- no beta redexes!")
-                    manualBeta env e2 (num+1)
+                    manualReduce env e2 (num+1)
 
-loopBeta :: Environment -> Expression -> Int -> IO ()
-loopBeta env exp num = do
+autoReduce :: Environment -> Expression -> Int -> IO ()
+autoReduce env exp num = do
     putStrLn ("-- " ++ show num ++ ": " ++ show exp)
     case (hasBetaRedex exp) of
         True -> do
@@ -80,7 +80,7 @@ loopBeta env exp num = do
                     showResult env exp
                 False -> do
                     let e2 = betaReduction exp
-                    loopBeta env e2 (num+1)
+                    autoReduce env e2 (num+1)
         False -> do
             putStrLn ("--- no beta redexes!") 
             showResult env exp

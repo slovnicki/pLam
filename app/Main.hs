@@ -37,15 +37,15 @@ execute line env =
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> putStrLn $ show err
-                        Right f -> do
-                            putStr ("- type reduction option (a-auto, m-manual, t-tree): ") 
+                        Right exp -> do
+                            putStr ("- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): ") 
                             hFlush stdout
                             op <- getLine
                             case op of
-                                "a"   -> loopBeta env f 0
-                                "m" -> manualBeta env f 0
-                                "t"   -> drawPossibleReductions f
-                                otherwise -> putStrLn (" ERROR: unknown execute option " ++ show op ++ "\n- available options for execution are:\n    a\n    m\n    t")
+                                "a" -> autoReduce env exp 0
+                                "m" -> manualReduce env exp 0
+                                "t" -> drawPossibleReductions exp
+                                otherwise -> showResult env (betaNF exp)
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f)
