@@ -36,17 +36,20 @@ reviewVariable ((v,e):rest) var
 id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
 
 findNumeral :: Expression -> Int -> String
+findNumeral app@(Application e1 id') num = do
+    case (alphaEquiv e1 id') of
+        True -> "none"
+        False -> findNumeral (betaReduction app) num
 findNumeral exp num = do
-    let e2 = betaReduction exp
-    case (alphaEquiv e2 id') of
+    case (alphaEquiv exp id') of
         True -> show num
         False -> do
-            case num>100 of
-                True -> "none"
-                False -> do
-                    case (hasBetaRedex e2) of
-                        True -> findNumeral e2 (num+1)
-                        False -> "none" 
+            case (hasBetaRedex exp) of
+                True -> do
+                    case num>=100 of
+                        True -> "none less than 100"
+                        False -> findNumeral (betaReduction exp) (num+1)
+                False -> "none" 
 
 showResult :: Environment -> Expression -> IO ()
 showResult env exp = do
