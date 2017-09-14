@@ -1,10 +1,10 @@
 -------------------------------------
 --             BOLEANS             --
 -------------------------------------
-define !true = \x y. x
-define !false = \x y. y
-define !not = \x. (x !false !true)
-define !and = \x y. (x y !false)
-define !or = \x y. (x !true y)
-define !xor = \x y. x (!not y) y
-define !if = \p x y. p x y
+true = \x y. x
+false = \x y. y
+not = \x. (x false true)
+and = \x y. (x y false)
+or = \x y. (x true y)
+xor = \x y. x (not y) y
+if = \p x y. p x y
