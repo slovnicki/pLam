@@ -52,7 +52,7 @@ data Error = SyntaxError ParseError
 
 instance Show Error where
     show (SyntaxError se)        = show se
-    show (UndeclaredVariable uv) = " ERROR: undeclared variable " ++ show uv ++ "\n- type \"review all\" to see all environment variables you can use\n- type \"define <variable name> = <lambda expression>\" to add new variables to environment"
+    show (UndeclaredVariable uv) = " ERROR: undeclared variable " ++ show uv ++ "\n- type \"review all\" to see all environment variables you can use\n- type \"<variable name> = <lambda expression>\" to add new variables to environment"
     show (FatalError fe)         = show fe
 
 type Failable = Either Error

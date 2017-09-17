@@ -47,7 +47,7 @@ LCI> -------------------------------------
 LCI> execute foo
 ERROR: undeclared variable "foo"
 - type "review all" to see all environment variables you can use
-- type "define <variable name> = <lambda expression>" to add new variables to environment
+- type "<variable name> = <lambda expression>" to add new variables to environment
 LCI> review all
  ENVIRONMENT:
 --- "id" = λx.x
