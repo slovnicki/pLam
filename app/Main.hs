@@ -11,14 +11,40 @@ import System.Exit
 
 
 -------------------------------------------------------------------------------------
-execAll :: [String] -> Environment -> Environment
-execAll lines env = foldl exec env lines  where
-    exec env line = case readLine line of
-        Left err -> trace ("-- " ++ show err) (env)
-        Right ex -> do
-            case ex of
-                Define v e -> snd $ (evalDefine v e) `runState` env
-                otherwise  -> env
+execAll :: [String] -> Environment -> IO Environment
+execAll [] env = do
+    putStr ""
+    return env
+execAll (line:ls) env =
+    case readLine line of
+        Left (SyntaxError err) -> do
+            putStrLn (show err) 
+            return env
+        Right ln -> do
+            case ln of 
+                Define v e -> do
+                    let (res, env') = (evalDefine v e) `runState` env
+                    case res of
+                        Left err -> do
+                            putStrLn (show err)
+                            return env
+                        Right f  -> execAll ls env'  
+                Import f -> do
+                    contents <- readFile ("import/" ++ f ++ ".txt")
+                    let exprs = lines contents
+                    env' <- execAll exprs env
+                    execAll ls env'
+                Execute e -> do
+                    let (res, env') = (evalExp e) `runState` env
+                    case res of
+                        Left err -> do
+                            putStrLn (show err)
+                            return env
+                        Right exp -> do
+                            let res = betaNF exp
+                            putStrLn ("----- result        : " ++ show (betaNF res) ++ "\n----- α-equivalent  : " ++ (convertToName env' res) ++ "\n----- Church numeral: " ++ (findNumeral (Application res id') 0) ++ "\n------------------------------") 
+                            execAll ls env'
+                otherwise -> execAll ls env
 
 execute :: String -> Environment -> IO Environment
 execute line env =
@@ -49,9 +75,9 @@ execute line env =
                                 otherwise -> showResult env (betaNF exp)
                     return env
                 Import f -> do
-                    contents <- readFile ("import/" ++ f)
+                    contents <- readFile ("import/" ++ f ++ ".txt")
                     let exprs = lines contents
-                    return $ execAll exprs env
+                    execAll exprs env
                 Review r -> do
                     case r of
                        "all" -> do
@@ -65,6 +91,7 @@ execute line env =
 -------------------------------------------------------------------------------------
                    -- MAIN with Read-Evaluate-Print Loop --
 -------------------------------------------------------------------------------------
+-- :run filename, new function for it
 main :: IO ()
 main = do
     repl [] where
@@ -74,6 +101,14 @@ main = do
             line <- getLine
             case line of
                 ":quit" -> exitSuccess
+                ":run" -> do
+                    putStr " > file? > "
+                    hFlush stdout
+                    file <- getLine
+                    contents <- readFile file
+                    let exprs = lines contents
+                    env' <- execAll exprs env
+                    repl env'
                 otherwise -> do
                     env' <- execute line env
                     repl env'
