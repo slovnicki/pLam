@@ -1,0 +1,18 @@
+-------------------------------------
+--            PROGRAM 0            --
+-------------------------------------
+import booleans
+import arithmetic
+import predicates
+import list
+-------------------------------------
+-------------------------------------
+id = \x. x
+execute (id (minus 5 4))
+execute (isZero 3)
+execute (if (leq 1 2) true false)
+-------------------------------------
+number7 = 7
+pair0 = (pair 0 7)
+pair1 = (pair pair0 2)
+execute (second (first pair1))
