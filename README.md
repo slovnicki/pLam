@@ -40,7 +40,7 @@ stack exec lci
 ## Examples:
 ### Fun with booleans
 ```
-LCI> import booleans.txt
+LCI> import booleans
 LCI> id = \x.x
 LCI> -- this is a comment line
 LCI> -------------------------------------
@@ -80,7 +80,7 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Fun with arithmetic
 ```
-LCI> import arithmetic.txt
+LCI> import arithmetic
 LCI> execute (succ (plus 0 1))
 - type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): m
 -- 0: (λn.λf.λx.(f ((n f) x)) ((λm.λn.λf.λx.((m f) ((n f) x)) λf.λx.x) λf.λx.(f x)))
@@ -140,9 +140,9 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Factorial
 ```
-LCI> import booleans.txt
-LCI> import arithmetic.txt
-LCI> import predicates.txt
+LCI> import booleans
+LCI> import arithmetic
+LCI> import predicates
 LCI> Y = \f. (\x. f(x x)) (\x. f(x x))
 LCI> fact = (Y (\f n. if (isZero n) 1 (mult n (f (pred n)))))
 LCI> execute (fact 3)
@@ -155,6 +155,29 @@ LCI> execute (fact 3)
 ----- result        : λf.λx.(f (f (f (f (f (f x))))))
 ----- α-equivalent  : none
 ----- Church numeral: 6
+LCI> :quit
+you@your-computer your/path/to/lambda-calculus-interpreter
+```
+### Running the existing program
+```
+LCI> :run
+ > file? > programs/program0.txt
+----- result        : λf.λx.(f x)
+----- α-equivalent  : none
+----- Church numeral: 1
+------------------------------
+----- result        : λx.λy.y
+----- α-equivalent  : "false"
+----- Church numeral: 0
+------------------------------
+----- result        : λx.λy.x
+----- α-equivalent  : "true"
+----- Church numeral: none
+------------------------------
+----- result        : λf.λx.(f (f (f (f (f (f (f x)))))))
+----- α-equivalent  : "number7"
+----- Church numeral: 7
+------------------------------
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
