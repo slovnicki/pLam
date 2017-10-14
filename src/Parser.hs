@@ -18,6 +18,7 @@ languageDef =
              , Token.reservedNames   = [ "execute"
                                        , "import"
                                        , "review"
+                                       , "run"
                                        ]
              , Token.reservedOpNames = [ "="
                                        , "." 
@@ -124,12 +125,20 @@ parseComment = do
     comm <- string "--"
     c <- comment
     return $ Comment c
+
+parseRun :: Parser Command
+parseRun = do
+    reserved "run"
+    spaces
+    f <- filename
+    return $ Run f
     
 parseLine :: Parser Command
 parseLine = parseDefine
          <|> parseExecute
          <|> parseImport
          <|> parseReview
+         <|> parseRun
          <|> parseComment
 -------------------------------------------------------------------------------------
 

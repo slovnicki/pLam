@@ -38,6 +38,7 @@ data Command = Define String Expression
              | Import String
              | Review String
              | Comment String
+             | Run String
              deriving (Eq, Show)
 -------------------------------------------------------------------------------------
 

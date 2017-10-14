@@ -86,6 +86,10 @@ execute line env =
                        otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
                 Comment c -> return env
+                Run f -> do
+                    contents <- readFile f
+                    let exprs = lines contents
+                    execAll exprs env
                     
 
 -------------------------------------------------------------------------------------
@@ -101,14 +105,6 @@ main = do
             line <- getLine
             case line of
                 ":quit" -> exitSuccess
-                ":run" -> do
-                    putStr " > file? > "
-                    hFlush stdout
-                    file <- getLine
-                    contents <- readFile file
-                    let exprs = lines contents
-                    env' <- execAll exprs env
-                    repl env'
                 otherwise -> do
                     env' <- execute line env
                     repl env'
