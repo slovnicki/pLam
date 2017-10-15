@@ -15,10 +15,11 @@ languageDef =
     emptyDef { Token.commentLine     = "--"
              , Token.identStart      = letter
              , Token.identLetter     = alphaNum
-             , Token.reservedNames   = [ "execute"
-                                       , "import"
-                                       , "review"
-                                       , "run"
+             , Token.reservedNames   = [ ":show"
+                                       , ":import"
+                                       , ":review"
+                                       , ":run"
+                                       , ":print"
                                        ]
              , Token.reservedOpNames = [ "="
                                        , "." 
@@ -38,10 +39,10 @@ type Parser = Parsec String ()
 
 -------------------------------------------------------------------------------------
 symbol :: Parser Char
-symbol = oneOf ".`#~@$%^&*_+|;:',/?[]<> "
+symbol = oneOf ".`#~@$%^&*_+-=|;:',/?[]<>(){} "
 
 comment :: Parser String
-comment = many $ letter <|> symbol <|> digit
+comment = many $ symbol <|> letter <|> digit
 
 filename :: Parser String
 filename = many1 $ letter <|> symbol <|> digit
@@ -99,23 +100,23 @@ parseDefine = do
     y <- parseExpression
     return $ Define var y
 
-parseExecute :: Parser Command
-parseExecute = do
-    reserved "execute"
+parseShow :: Parser Command
+parseShow = do
+    reserved ":show"
     spaces
     ex <- parseExpression
-    return $ Execute ex
+    return $ Show ex
 
 parseImport :: Parser Command
 parseImport = do
-    reserved "import"
+    reserved ":import"
     spaces
     f <- filename
     return $ Import f
 
 parseReview :: Parser Command
 parseReview = do
-    reserved "review"
+    reserved ":review"
     spaces
     f <- identifier
     return $ Review f
@@ -128,17 +129,25 @@ parseComment = do
 
 parseRun :: Parser Command
 parseRun = do
-    reserved "run"
+    reserved ":run"
     spaces
     f <- filename
     return $ Run f
+
+parsePrint :: Parser Command
+parsePrint = do
+    reserved ":print"
+    spaces
+    str <- comment
+    return $ Print str 
     
 parseLine :: Parser Command
 parseLine = parseDefine
-         <|> parseExecute
+         <|> parseShow
          <|> parseImport
          <|> parseReview
          <|> parseRun
+         <|> parsePrint
          <|> parseComment
 -------------------------------------------------------------------------------------
 

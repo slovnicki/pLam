@@ -27,23 +27,26 @@ execAll (line:ls) env =
                     case res of
                         Left err -> do
                             putStrLn (show err)
-                            return env
+                            execAll ls env'
                         Right f  -> execAll ls env'  
                 Import f -> do
                     contents <- readFile ("import/" ++ f ++ ".txt")
                     let exprs = lines contents
                     env' <- execAll exprs env
                     execAll ls env'
-                Execute e -> do
+                Show e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> do
-                            putStrLn (show err)
+                            putStrLn (show e)
                             return env
                         Right exp -> do
-                            let res = betaNF exp
-                            putStrLn ("----- result        : " ++ show (betaNF res) ++ "\n----- α-equivalent  : " ++ (convertToName env' res) ++ "\n----- Church numeral: " ++ (findNumeral (Application res id') 0) ++ "\n------------------------------") 
+                            --putStrLn ("----- original term : " ++ show exp)
+                            showResult env exp
                             execAll ls env'
+                Print s -> do
+                    putStrLn s
+                    execAll ls env
                 otherwise -> execAll ls env
 
 execute :: String -> Environment -> IO Environment
@@ -60,11 +63,12 @@ execute line env =
                         Left err -> putStrLn $ show err
                         Right f  -> putStr("") 
                     return env'
-                Execute e -> do
+                Show e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
-                        Left err -> putStrLn $ show err
+                        Left err -> putStrLn $ show e
                         Right exp -> do
+                            --putStrLn ("----- original term : " ++ show exp)
                             putStr ("- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): ") 
                             hFlush stdout
                             op <- getLine
@@ -72,7 +76,7 @@ execute line env =
                                 "a" -> autoReduce env exp 0
                                 "m" -> manualReduce env exp 0
                                 "t" -> drawPossibleReductions exp
-                                otherwise -> showResult env (betaNF exp)
+                                otherwise -> showResult env exp
                     return env
                 Import f -> do
                     contents <- readFile ("import/" ++ f ++ ".txt")
@@ -85,11 +89,15 @@ execute line env =
                            mapM_ showGlobal env
                        otherwise -> putStrLn("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
-                Comment c -> return env
                 Run f -> do
                     contents <- readFile f
                     let exprs = lines contents
                     execAll exprs env
+                Print s -> do
+                    putStrLn s
+                    putStrLn ("(NOTE: it makes more sense to use a comment line (starts with double '-''-' than :print command when you are in interactive mode)")
+                    return env
+                Comment c -> return env
                     
 
 -------------------------------------------------------------------------------------

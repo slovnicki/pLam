@@ -34,11 +34,12 @@ instance Show Expression where
 
 -------------------------------------------------------------------------------------
 data Command = Define String Expression
-             | Execute Expression
+             | Show Expression
              | Import String
              | Review String
              | Comment String
              | Run String
+             | Print String
              deriving (Eq, Show)
 -------------------------------------------------------------------------------------
 

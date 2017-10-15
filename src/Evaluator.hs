@@ -15,7 +15,7 @@ evalVar a = state $ \e -> (reference a e, e) where
 
 evalAbs :: LambdaVar -> Expression -> Program (Failable Expression)
 evalAbs x@(LambdaVar n i) y = do
-    modify(([n],(Variable x)):)
+    modify(([n] ++ (showHelper i),(Variable x)):)
     y' <- evalExp y
     case y' of
         Left err  -> return $ Left err

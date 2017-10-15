@@ -1,18 +1,22 @@
 -------------------------------------
 --            PROGRAM 0            --
 -------------------------------------
-import booleans
-import arithmetic
-import predicates
-import list
+:import booleans
+:import arithmetic
+:import predicates
+:import list
 -------------------------------------
 -------------------------------------
 id = \x. x
-execute (id (minus 5 4))
-execute (isZero 3)
-execute (if (leq 1 2) true false)
+:print 5 - 4 = ?
+:show (id (minus 5 4))
+:print is 3 equal to 0?
+:show (isZero 3)
+:print is 1 less than or equal to 2?
+:show (if (leq 1 2) true false)
 -------------------------------------
 number7 = 7
 pair0 = (pair 0 7)
 pair1 = (pair pair0 2)
-execute (second (first pair1))
+:print second of first of ((0,7),2)
+:show (second (first pair1))

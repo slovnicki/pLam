@@ -16,7 +16,13 @@ convertToName :: Environment -> Expression -> String
 convertToName [] ex = "none"
 convertToName ((v,e):rest) ex 
     | alphaEquiv e ex = show v
-    | otherwise            = convertToName rest ex
+    | otherwise       = convertToName rest ex
+
+isDefined :: Environment -> String -> Bool
+isDefined [] s = False
+isDefined ((v,e):rest) s
+    | v == s    = True
+    | otherwise = isDefined rest s
 
 reviewVariable :: Environment -> String -> String
 reviewVariable [] var = "none"
@@ -48,9 +54,10 @@ findNumeral exp num = do
 -------------------------------------------------------------------------------------
 showResult :: Environment -> Expression -> IO ()
 showResult env exp = do
-    putStrLn ("----- result        : " ++ show exp)
-    putStrLn ("----- α-equivalent  : " ++ convertToName env exp)
-    putStrLn ("----- Church numeral: " ++ findNumeral (Application exp id') 0)
+    let bnf = betaNF exp
+    putStrLn ("----- β normal form : " ++ show bnf)
+    putStrLn ("----- α-equivalent  : " ++ convertToName env bnf)
+    putStrLn ("----- Church numeral: " ++ findNumeral (Application bnf id') 0)
     
 
 manualReduce :: Environment -> Expression -> Int -> IO ()
