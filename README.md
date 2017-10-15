@@ -40,15 +40,15 @@ stack exec lci
 ## Examples:
 ### Fun with booleans
 ```
-LCI> import booleans
+LCI> :import booleans
 LCI> id = \x.x
 LCI> -- this is a comment line
 LCI> -------------------------------------
-LCI> execute foo
+LCI> :show foo
 ERROR: undeclared variable "foo"
 - type "review all" to see all environment variables you can use
 - type "<variable name> = <lambda expression>" to add new variables to environment
-LCI> review all
+LCI> :review all
  ENVIRONMENT:
 --- "id" = λx.x
 --- "xor" = λx.λy.((x (λx.((x λx.λy.y) λx.λy.x) y)) y)
@@ -59,7 +59,7 @@ LCI> review all
 --- "true" = λx.λy.x
 LCI> --------------------------------------
 LCI> foo = id
-LCI> execute (foo (or false (not true)))
+LCI> :show (foo (or false (not true)))
 - type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
 -- 0: (λx.x ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x)))
 -- 1: ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
@@ -71,7 +71,7 @@ LCI> execute (foo (or false (not true)))
 -- 7: (λy.λx.λy.y λx.λy.x)
 -- 8: λx.λy.y
 --- no beta redexes!
------ result        : λx.λy.y
+----- β normal form : λx.λy.y
 ----- α-equivalent  : "false"
 ----- Church numeral: 0
 LCI> :quit
@@ -80,8 +80,9 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Fun with arithmetic
 ```
-LCI> import arithmetic
-LCI> execute (succ (plus 0 1))
+LCI> :import arithmetic
+LCI> two = (succ (plus 0 1))
+LCI> :show two
 - type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): m
 -- 0: (λn.λf.λx.(f ((n f) x)) ((λm.λn.λf.λx.((m f) ((n f) x)) λf.λx.x) λf.λx.(f x)))
 Continue? [Y/n]
@@ -117,7 +118,7 @@ Continue? [Y/n]
 -- 10: λf.λx.(f (f x))
 Continue? [Y/n]
 n
------ result        : λf.λx.(f (f x))
+----- β normal form : λf.λx.(f (f x))
 ----- α-equivalent  : none
 ----- Church numeral: 2
 LCI> :quit
@@ -126,7 +127,7 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Renaming
 ```
-LCI> execute ((\f x. f x) (\f x. f x))
+LCI> :show ((\f x. f x) (\f x. f x))
 - type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): t
 (λf.λx.(f x) λf.λx.(f x))
 |
@@ -140,19 +141,19 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 
 ### Factorial
 ```
-LCI> import booleans
-LCI> import arithmetic
-LCI> import predicates
+LCI> :import booleans
+LCI> :import arithmetic
+LCI> :import predicates
 LCI> Y = \f. (\x. f(x x)) (\x. f(x x))
 LCI> fact = (Y (\f n. if (isZero n) 1 (mult n (f (pred n)))))
-LCI> execute (fact 3)
+LCI> :show (fact 3)
 - type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
 ...
 ...
 ...
     (after 694 steps)
 --- no beta redexes!
------ result        : λf.λx.(f (f (f (f (f (f x))))))
+----- β normal form : λf.λx.(f (f (f (f (f (f x))))))
 ----- α-equivalent  : none
 ----- Church numeral: 6
 LCI> :quit
@@ -160,24 +161,24 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ```
 ### Running the existing program
 ```
-LCI> :run
- > file? > programs/program0.txt
------ result        : λf.λx.(f x)
+LCI> :run programs/program0.txt
+5 - 4 = ?
+----- β normal form : λf.λx.(f x)
 ----- α-equivalent  : none
 ----- Church numeral: 1
-------------------------------
------ result        : λx.λy.y
+is 3 equal to 0?
+----- β normal form : λx.λy.y
 ----- α-equivalent  : "false"
 ----- Church numeral: 0
-------------------------------
------ result        : λx.λy.x
+is 1 less than or equal to 2?
+----- β normal form : λx.λy.x
 ----- α-equivalent  : "true"
 ----- Church numeral: none
-------------------------------
------ result        : λf.λx.(f (f (f (f (f (f (f x)))))))
+second of first of ((0,7),2)
+----- β normal form : λf.λx.(f (f (f (f (f (f (f x)))))))
 ----- α-equivalent  : "number7"
 ----- Church numeral: 7
-------------------------------
+
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
