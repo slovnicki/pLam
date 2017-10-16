@@ -11,24 +11,32 @@ import System.Exit
 
 
 -------------------------------------------------------------------------------------
+isDefine :: String -> Bool
+isDefine [] = False
+isDefine (char:cs)
+    | char == '=' = True
+    | otherwise   = isDefine cs
+
 execAll :: [String] -> Environment -> IO Environment
-execAll [] env = do
-    putStr ""
-    return env
+execAll [] env = return env
 execAll (line:ls) env =
-    case readLine line of
-        Left (SyntaxError err) -> do
-            putStrLn (show err) 
-            return env
-        Right ln -> do
-            case ln of 
-                Define v e -> do
-                    let (res, env') = (evalDefine v e) `runState` env
-                    case res of
-                        Left err -> do
-                            putStrLn (show err)
-                            execAll ls env'
-                        Right f  -> execAll ls env'  
+    case isDefine line of
+        True -> case readDefine line of
+            Left (SyntaxError e) -> do
+                putStrLn $ (show e ++ "\ntrying to define? correct syntax is '<String> = <Expression>'")
+                return env
+            Right (Define v e) -> do
+                let (res, env') = (evalDefine v e) `runState` env
+                case res of
+                    Left err -> do
+                        putStrLn (show err)
+                        execAll ls env'
+                    Right f  -> execAll ls env' 
+        False -> case readLine line of
+            Left (SyntaxError err) -> do
+                putStrLn (show err) 
+                return env
+            Right comm -> case comm of   
                 Import f -> do
                     contents <- readFile ("import/" ++ f ++ ".txt")
                     let exprs = lines contents
@@ -38,7 +46,7 @@ execAll (line:ls) env =
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> do
-                            putStrLn (show e)
+                            putStrLn (show err)
                             return env
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
@@ -50,19 +58,23 @@ execAll (line:ls) env =
                 otherwise -> execAll ls env
 
 execute :: String -> Environment -> IO Environment
-execute line env =
-    case readLine line of
-        Left (SyntaxError e) -> do
-            putStrLn $ show e
-            return env
-        Right c -> do
-            case c of 
-                Define v e -> do 
-                    let (res, env') = (evalDefine v e) `runState` env
-                    case res of
-                        Left err -> putStrLn $ show err
-                        Right f  -> putStr("") 
-                    return env'
+execute line env = 
+    case isDefine line of
+        True -> case readDefine line of
+            Left (SyntaxError e) -> do
+                putStrLn $ (show e ++ "\ntrying to define? correct syntax is '<String> = <Expression>'")
+                return env
+            Right (Define v e) -> do
+                let (res, env') = (evalDefine v e) `runState` env
+                case res of
+                    Left err -> putStrLn $ show err
+                    Right f  -> putStr("") 
+                return env'
+        False -> case readLine line of
+            Left (SyntaxError e) -> do
+                putStrLn $ show e
+                return env
+            Right comm -> case comm of 
                 Show e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
@@ -95,7 +107,7 @@ execute line env =
                     execAll exprs env
                 Print s -> do
                     putStrLn s
-                    putStrLn ("(NOTE: it makes more sense to use a comment line (starts with double '-''-' than :print command when you are in interactive mode)")
+                    putStrLn ("(NOTE: it makes more sense to use a comment line (starts with double '-' than :print command when you are in interactive mode)")
                     return env
                 Comment c -> return env
                     
@@ -103,7 +115,6 @@ execute line env =
 -------------------------------------------------------------------------------------
                    -- MAIN with Read-Evaluate-Print Loop --
 -------------------------------------------------------------------------------------
--- :run filename, new function for it
 main :: IO ()
 main = do
     repl [] where

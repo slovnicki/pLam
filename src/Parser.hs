@@ -15,8 +15,7 @@ languageDef =
     emptyDef { Token.commentLine     = "--"
              , Token.identStart      = letter
              , Token.identLetter     = alphaNum
-             , Token.reservedNames   = [ ":show"
-                                       , ":import"
+             , Token.reservedNames   = [ ":import"
                                        , ":review"
                                        , ":run"
                                        , ":print"
@@ -39,7 +38,7 @@ type Parser = Parsec String ()
 
 -------------------------------------------------------------------------------------
 symbol :: Parser Char
-symbol = oneOf ".`#~@$%^&*_+-=|;:',/?[]<>(){} "
+symbol = oneOf ".`#~@$%^&*_+-=|;',/?[]<>(){} "
 
 comment :: Parser String
 comment = many $ symbol <|> letter <|> digit
@@ -102,8 +101,6 @@ parseDefine = do
 
 parseShow :: Parser Command
 parseShow = do
-    reserved ":show"
-    spaces
     ex <- parseExpression
     return $ Show ex
 
@@ -142,8 +139,7 @@ parsePrint = do
     return $ Print str 
     
 parseLine :: Parser Command
-parseLine = parseDefine
-         <|> parseShow
+parseLine = parseShow
          <|> parseImport
          <|> parseReview
          <|> parseRun
@@ -154,6 +150,11 @@ parseLine = parseDefine
 -------------------------------------------------------------------------------------
 readLine :: String -> Failable Command
 readLine input = case parse parseLine "parser" input of
+    Left err -> Left $ SyntaxError err
+    Right l -> Right l
+
+readDefine :: String -> Failable Command
+readDefine input = case parse parseDefine "define" input of
     Left err -> Left $ SyntaxError err
     Right l -> Right l 
 
