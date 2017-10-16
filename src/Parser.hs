@@ -19,6 +19,7 @@ languageDef =
                                        , ":review"
                                        , ":run"
                                        , ":print"
+                                       , ":d"
                                        ]
              , Token.reservedOpNames = [ "="
                                        , "." 
@@ -104,6 +105,13 @@ parseShow = do
     ex <- parseExpression
     return $ Show ex
 
+parseShowDetailed :: Parser Command
+parseShowDetailed = do
+    reserved ":d"
+    spaces
+    ex <- parseExpression
+    return $ ShowDetailed ex
+
 parseImport :: Parser Command
 parseImport = do
     reserved ":import"
@@ -140,6 +148,7 @@ parsePrint = do
     
 parseLine :: Parser Command
 parseLine = parseShow
+         <|> parseShowDetailed
          <|> parseImport
          <|> parseReview
          <|> parseRun

@@ -79,6 +79,12 @@ execute line env =
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> putStrLn $ show e
+                        Right exp -> showResult env exp
+                    return env
+                ShowDetailed e -> do
+                    let (res, env') = (evalExp e) `runState` env
+                    case res of
+                        Left err -> putStrLn $ show e
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
                             putStr ("- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): ") 

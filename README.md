@@ -46,21 +46,23 @@ LCI> -- this is a comment line
 LCI> -------------------------------------
 LCI> foo
 ERROR: undeclared variable "foo"
-- type "review all" to see all environment variables you can use
+- type ":review all" to see all environment variables you can use
 - type "<variable name> = <lambda expression>" to add new variables to environment
-LCI> :review all
- ENVIRONMENT:
---- "id" = λx.x
---- "xor" = λx.λy.((x (λx.((x λx.λy.y) λx.λy.x) y)) y)
---- "or" = λx.λy.((x λx.λy.x) y)
---- "and" = λx.λy.((x y) λx.λy.y)
---- "not" = λx.((x λx.λy.y) λx.λy.x)
---- "false" = λx.λy.y
---- "true" = λx.λy.x
-LCI> --------------------------------------
 LCI> foo = id
+LCI> --------------------------------------
+LCI> --------------------------------------
+LCI> -- immediate solution --
+LCI> --------------------------------------
 LCI> (foo (or false (not true)))
-- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
+----- β normal form : λx.λy.y
+----- α-equivalent  : "false"
+----- Church numeral: 0
+LCI> --------------------------------------
+LCI> --------------------------------------
+LCI> -- detailed solution --
+LCI> --------------------------------------
+LCI> :d (foo (or false (not true)))
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-immediate]): a
 -- 0: (λx.x ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x)))
 -- 1: ((λx.λy.((x λx.λy.x) y) λx.λy.y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
 -- 2: (λy.((λx.λy.y λx.λy.x) y) (λx.((x λx.λy.y) λx.λy.x) λx.λy.x))
@@ -82,8 +84,8 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ```
 LCI> :import arithmetic
 LCI> two = (succ (plus 0 1))
-LCI> two
-- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): m
+LCI> :d two
+- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-immediate]): m
 -- 0: (λn.λf.λx.(f ((n f) x)) ((λm.λn.λf.λx.((m f) ((n f) x)) λf.λx.x) λf.λx.(f x)))
 Continue? [Y/n]
 
@@ -128,13 +130,9 @@ you@your-computer your/path/to/lambda-calculus-interpreter
 ### Renaming
 ```
 LCI> ((\f x. f x) (\f x. f x))
-- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): t
-(λf.λx.(f x) λf.λx.(f x))
-|
-`- λx.(λf.λx.(f x) x)
-   |
-   `- λx.λf'.(x f')
-
+----- β normal form : λx.λf'.(x f')
+----- α-equivalent  : none
+----- Church numeral: 1
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```
@@ -147,12 +145,6 @@ LCI> :import predicates
 LCI> Y = \f. (\x. f(x x)) (\x. f(x x))
 LCI> fact = (Y (\f n. if (isZero n) 1 (mult n (f (pred n)))))
 LCI> (fact 3)
-- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): a
-...
-...
-...
-    (after 694 steps)
---- no beta redexes!
 ----- β normal form : λf.λx.(f (f (f (f (f (f x))))))
 ----- α-equivalent  : none
 ----- Church numeral: 6
@@ -178,7 +170,6 @@ second of first of ((0,7),2)
 ----- β normal form : λf.λx.(f (f (f (f (f (f (f x)))))))
 ----- α-equivalent  : "number7"
 ----- Church numeral: 7
-
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
 ```

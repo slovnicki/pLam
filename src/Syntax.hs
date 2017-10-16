@@ -35,6 +35,7 @@ instance Show Expression where
 -------------------------------------------------------------------------------------
 data Command = Define String Expression
              | Show Expression
+             | ShowDetailed Expression
              | Import String
              | Review String
              | Comment String
