@@ -7,6 +7,7 @@ import Prelude hiding (null,filter,map,rem)
 import qualified Data.List as List
 import Data.Set hiding (fold)
 import Data.Tree
+import System.Console.Haskeline
 
 import Syntax
 
@@ -116,7 +117,7 @@ rTree :: Expression -> Tree Expression
 rTree x = Node x (List.map rTree . toList . delete x $ rList id x)
 
 -- |draws the tree with all possible reductions
-drawPossibleReductions :: Expression -> IO ()
-drawPossibleReductions = putStrLn . drawTree . fmap show . rTree
+drawPossibleReductions :: Expression -> InputT IO ()
+drawPossibleReductions = outputStrLn . drawTree . fmap show . rTree
 -------------------------------------------------------------------------------------
 

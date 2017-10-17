@@ -6,11 +6,12 @@ import Reducer
 import Control.Monad.State
 import System.IO (hFlush, stdout)
 import Debug.Trace
+import System.Console.Haskeline
 
 
 -------------------------------------------------------------------------------------
-showGlobal :: (String, Expression) -> IO ()
-showGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
+showGlobal :: (String, Expression) -> InputT IO ()
+showGlobal (n, e) = outputStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
 convertToName [] ex = "none"
@@ -52,43 +53,42 @@ findNumeral exp num = do
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
-showResult :: Environment -> Expression -> IO ()
+showResult :: Environment -> Expression -> InputT IO ()
 showResult env exp = do
     let bnf = betaNF exp
-    putStrLn ("----- β normal form : " ++ show bnf)
-    putStrLn ("----- α-equivalent  : " ++ convertToName env bnf)
-    putStrLn ("----- Church numeral: " ++ findNumeral (Application bnf id') 0)
+    outputStrLn ("----- β normal form : " ++ show bnf)
+    outputStrLn ("----- α-equivalent  : " ++ convertToName env bnf)
+    outputStrLn ("----- Church numeral: " ++ findNumeral (Application bnf id') 0)
     
 
-manualReduce :: Environment -> Expression -> Int -> IO ()
+manualReduce :: Environment -> Expression -> Int -> InputT IO ()
 manualReduce env exp num = do
-    putStrLn ("-- " ++ show num ++ ": " ++ show exp)
-    putStrLn ("Continue? [Y/n]") 
-    hFlush stdout
-    line <- getLine
+    outputStrLn ("-- " ++ show num ++ ": " ++ show exp)
+    --outputStrLn ("Continue? [Y/n]") 
+    line <- getInputLine "Continue? [Y/n]"
     case line of
-        "n" -> showResult env exp
+        Just "n" -> showResult env exp
         otherwise -> do
             let e2 = betaReduction exp
             case (hasBetaRedex exp) of
                 True -> manualReduce env e2 (num+1)
                 False -> do
-                    putStrLn ("--- no beta redexes!")
+                    outputStrLn ("--- no beta redexes!")
                     manualReduce env e2 (num+1)
 
-autoReduce :: Environment -> Expression -> Int -> IO ()
+autoReduce :: Environment -> Expression -> Int -> InputT IO ()
 autoReduce env exp num = do
-    putStrLn ("-- " ++ show num ++ ": " ++ show exp)
+    outputStrLn ("-- " ++ show num ++ ": " ++ show exp)
     case (hasBetaRedex exp) of
         True -> do
             case num>1000 of
                 True  -> do 
-                    putStrLn ("--- 1000 reductions limit!")
+                    outputStrLn ("--- 1000 reductions limit!")
                     showResult env exp
                 False -> do
                     let e2 = betaReduction exp
                     autoReduce env e2 (num+1)
         False -> do
-            putStrLn ("--- no beta redexes!") 
+            outputStrLn ("--- no beta redexes!") 
             showResult env exp
 -------------------------------------------------------------------------------------
