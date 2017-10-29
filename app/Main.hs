@@ -12,28 +12,11 @@ import System.Console.Haskeline
 
 
 -------------------------------------------------------------------------------------
-isDefine :: String -> Bool
-isDefine [] = False
-isDefine (char:cs)
-    | char == '=' = True
-    | otherwise   = isDefine cs
 
 execAll :: [String] -> Environment -> InputT IO Environment
 execAll [] env = return env
 execAll (line:ls) env =
-    case isDefine line of
-        True -> case readDefine line of
-            Left (SyntaxError e) -> do
-                outputStrLn $ (show e ++ "\ntrying to define? correct syntax is '<String> = <Expression>'")
-                return env
-            Right (Define v e) -> do
-                let (res, env') = (evalDefine v e) `runState` env
-                case res of
-                    Left err -> do
-                        outputStrLn (show err)
-                        execAll ls env'
-                    Right f  -> execAll ls env' 
-        False -> case readLine line of
+    case readLine line of
             Left (SyntaxError err) -> do
                 outputStrLn (show err) 
                 return env
@@ -43,6 +26,13 @@ execAll (line:ls) env =
                     let exprs = lines content
                     env' <- execAll exprs env
                     execAll ls env'
+                Define v e -> do
+                    let (res, env') = (evalDefine v e) `runState` env
+                    case res of
+                        Left err -> do
+                            outputStrLn (show err)
+                            execAll ls env'
+                        Right f  -> execAll ls env'
                 Show e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
@@ -60,32 +50,27 @@ execAll (line:ls) env =
 
 execute :: String -> Environment -> InputT IO Environment
 execute line env = 
-    case isDefine line of
-        True -> case readDefine line of
-            Left (SyntaxError e) -> do
-                outputStrLn $ (show e ++ "\ntrying to define? correct syntax is '<String> = <Expression>'")
-                return env
-            Right (Define v e) -> do
-                let (res, env') = (evalDefine v e) `runState` env
-                case res of
-                    Left err -> outputStrLn $ show err
-                    Right f  -> outputStr "" 
-                return env'
-        False -> case readLine line of
+    case readLine line of
             Left (SyntaxError e) -> do
                 outputStrLn $ show e
                 return env
-            Right comm -> case comm of 
+            Right comm -> case comm of
+                Define v e -> do
+                    let (res, env') = (evalDefine v e) `runState` env
+                    case res of
+                        Left err -> outputStrLn (show err)
+                        Right exp -> outputStr ""
+                    return env'
                 Show e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
-                        Left err -> outputStrLn $ show e
+                        Left err -> outputStrLn $ show err
                         Right exp -> showResult env exp
                     return env
                 ShowDetailed e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
-                        Left err -> outputStrLn $ show e
+                        Left err -> outputStrLn $ show err
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
                             op <- getInputLine "- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): "

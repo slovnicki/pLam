@@ -70,7 +70,7 @@ parseVariable = do
 parseAbstraction :: Parser Expression
 parseAbstraction = do
   reservedOp "\\"
-  xs <- letter `endBy1` spaces
+  xs <- endBy1 letter spaces
   reservedOp "."
   spaces
   body <- parseApplication
@@ -80,14 +80,19 @@ parseAbstraction = do
 
 parseApplication :: Parser Expression
 parseApplication = do
-  es <- parseExpression `sepBy1` spaces
+  es <- sepBy1 parseSingleton spaces
   return $ foldl1 Application es
 
 parseExpression :: Parser Expression
 parseExpression =  parens parseApplication
-               <|> parseChurch
-               <|> parseVariable
-               <|> parseAbstraction
+               <|> parseApplication
+               <|> parseSingleton
+
+parseSingleton :: Parser Expression
+parseSingleton =  parseChurch
+              <|> parseVariable
+              <|> parseAbstraction
+              <|> parens parseApplication
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -147,13 +152,14 @@ parsePrint = do
     return $ Print str 
     
 parseLine :: Parser Command
-parseLine = parseShow
+parseLine =  try parseDefine
          <|> parseShowDetailed
          <|> parseImport
          <|> parseReview
          <|> parseRun
          <|> parsePrint
          <|> parseComment
+         <|> parseShow
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -161,9 +167,4 @@ readLine :: String -> Failable Command
 readLine input = case parse parseLine "parser" input of
     Left err -> Left $ SyntaxError err
     Right l -> Right l
-
-readDefine :: String -> Failable Command
-readDefine input = case parse parseDefine "define" input of
-    Left err -> Left $ SyntaxError err
-    Right l -> Right l 
 
