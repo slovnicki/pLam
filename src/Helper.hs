@@ -46,8 +46,8 @@ findNumeral exp num = do
         False -> do
             case (hasBetaRedex exp) of
                 True -> do
-                    case num>=100 of
-                        True -> "none less than 100"
+                    case num>=1000 of
+                        True -> "none less than 1000"
                         False -> findNumeral (betaReduction exp) (num+1)
                 False -> "none" 
 -------------------------------------------------------------------------------------
@@ -57,8 +57,15 @@ showResult :: Environment -> Expression -> InputT IO ()
 showResult env exp = do
     let bnf = betaNF exp
     outputStrLn ("----- β normal form : " ++ show bnf)
-    outputStrLn ("----- α-equivalent  : " ++ convertToName env bnf)
-    outputStrLn ("----- Church numeral: " ++ findNumeral (Application bnf id') 0)
+    let name = convertToName env bnf
+    case name of
+        "none" -> outputStr ""
+        otherwise -> outputStrLn ("----- α-equivalent  : " ++ name)
+    let numeral = findNumeral (Application bnf id') 0
+    case numeral of
+        "none" -> outputStr ""
+        "none less than 1000" -> outputStr ""
+        otherwise -> outputStrLn ("----- Church numeral: " ++ numeral)
     
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
