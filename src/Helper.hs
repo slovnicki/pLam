@@ -9,15 +9,39 @@ import Debug.Trace
 import System.Console.Haskeline
 
 
+id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
+
 -------------------------------------------------------------------------------------
 showGlobal :: (String, Expression) -> InputT IO ()
 showGlobal (n, e) = outputStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
+convertToName [] abs@(Abstraction v e) = do
+    let numeral = findNumeral (Application abs id') 0
+    case numeral of
+        "none" -> "none"
+        otherwise -> numeral
 convertToName [] ex = "none"
 convertToName ((v,e):rest) ex 
-    | alphaEquiv e ex = show v
+    | alphaEquiv e ex = v
     | otherwise       = convertToName rest ex
+
+convertToNames :: Environment -> Expression -> String
+convertToNames env (Variable v) = show v
+convertToNames env app@(Application m n) = do
+    --let app1 = trace ("app " ++ show m ++ " : " ++ show n) (convertToName env app)
+    let app1 = convertToName env app
+    case app1 of
+        "none" -> "(" ++ (convertToNames env m) ++ " " ++ (convertToNames env n) ++ ")"
+        otherwise -> app1
+        --otherwise -> trace (" ------> " ++ app1) app1
+convertToNames env abs@(Abstraction v e) = do
+    --let abs1 = trace ("abs " ++ show v ++ " : " ++ show e) (convertToName env abs)
+    let abs1 = convertToName env abs
+    case abs1 of
+        "none" -> "(λ" ++ (show v) ++ ". " ++ (convertToNames env e) ++ ")"
+        otherwise -> abs1
+        --otherwise -> trace (" ------> " ++ abs1) abs1
 
 isDefined :: Environment -> String -> Bool
 isDefined [] s = False
@@ -33,7 +57,6 @@ reviewVariable ((v,e):rest) var
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
-id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
 
 findNumeral :: Expression -> Int -> String
 findNumeral app@(Application e1 id') num = do
@@ -46,8 +69,8 @@ findNumeral exp num = do
         False -> do
             case (hasBetaRedex exp) of
                 True -> do
-                    case num>=1000 of
-                        True -> "none less than 1000"
+                    case num>=10 of
+                        True -> "none"
                         False -> findNumeral (betaReduction exp) (num+1)
                 False -> "none" 
 -------------------------------------------------------------------------------------
@@ -61,17 +84,12 @@ showResult env exp = do
     case name of
         "none" -> outputStr ""
         otherwise -> outputStrLn ("----- α-equivalent  : " ++ name)
-    let numeral = findNumeral (Application bnf id') 0
-    case numeral of
-        "none" -> outputStr ""
-        "none less than 1000" -> outputStr ""
-        otherwise -> outputStrLn ("----- Church numeral: " ++ numeral)
     
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
-manualReduce env exp num = do
-    outputStrLn ("-- " ++ show num ++ ": " ++ show exp)
-    --outputStrLn ("Continue? [Y/n]") 
+manualReduce env exp num = do 
+    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
+    --outputStrLn ("---- (" ++ show num ++ ": " ++ show exp ++ ")")
     line <- getInputLine "Continue? [Y/n]"
     case line of
         Just "n" -> showResult env exp
@@ -85,7 +103,8 @@ manualReduce env exp num = do
 
 autoReduce :: Environment -> Expression -> Int -> InputT IO ()
 autoReduce env exp num = do
-    outputStrLn ("-- " ++ show num ++ ": " ++ show exp)
+    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
+    --outputStrLn ("---- (" ++ show num ++ ": " ++ show exp ++ ")")
     case (hasBetaRedex exp) of
         True -> do
             case num>1000 of
