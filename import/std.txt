@@ -3,11 +3,11 @@
 -------------------------------------------
 -------------------------------------------
 ---------------- BOOLEANS -----------------
-true = \x y. x
-false = \x y. y
-not = \x. (x false true)
-and = \x y. (x y false)
-or = \x y. (x true y)
+T = \x y. x
+F = \x y. y
+not = \x. (x F T)
+and = \x y. (x y F)
+or = \x y. (x T y)
 xor = \x y. x (not y) y
 if = \p x y. p x y
 -------------------------------------------
@@ -20,6 +20,6 @@ pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
 minus = \m n. (n pred) m
 -------------------------------------------
 --------------- PREDICATES ----------------
-isZero = \n. n (\x. false) true
+isZero = \n. n (\x. F) T
 leq = \m n. isZero (minus m n)
 eq = \m n. and (leq m n) (leq n m)
