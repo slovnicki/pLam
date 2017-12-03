@@ -38,6 +38,9 @@ stack exec lci
 ```
 
 ## Examples:
+Output might be slightly different due to constant fixes and changes.
+Fully updated examples will be put each time they diverge too far from current.
+
 ### Fun with booleans
 ```
 LCI> :import booleans
