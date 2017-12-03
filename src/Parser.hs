@@ -137,6 +137,11 @@ parseComment = do
     c <- comment
     return $ Comment c
 
+parseEmptyLine :: Parser Command
+parseEmptyLine = do
+    emp <- string ""
+    return $ Comment " "
+
 parseRun :: Parser Command
 parseRun = do
     reserved ":run"
@@ -160,6 +165,7 @@ parseLine =  try parseDefine
          <|> parsePrint
          <|> parseComment
          <|> parseShow
+         <|> parseEmptyLine
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
