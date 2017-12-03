@@ -1,0 +1,19 @@
+-------------------------------------------
+--        COMPUTABILITY LIBRARY          --
+-------------------------------------------
+
+:import std
+
+--------- FIXED POINT COMBINATOR ----------
+Y = \f. (\x. f(x x)) (\x. f(x x))
+
+------------ INITIAL FUNCTIONS ------------
+Z = \x. 0
+S = \n f x. f (n f x)
+I = \x. x 
+
+----------- PRIMITIVE RECURSION -----------
+PR = \G H. Y (\f k x. (isZero k) (G x) (H (pred k) x (f ((pred k) x))))
+
+--------------- MINIMIZATION --------------
+M = \P. (Y (\h z. (P z) z (h (succ z)))) 0
