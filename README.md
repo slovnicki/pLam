@@ -40,6 +40,7 @@ stack exec lci
 ## Examples:
 Output might be slightly different due to constant fixes and changes.
 Fully updated examples will be put each time they diverge too far from current.
+(Check the newswest example (minimization) which is up to date)
 
 ### Fun with booleans
 ```
@@ -175,4 +176,26 @@ second of first of ((0,7),2)
 ----- Church numeral: 7
 LCI> :quit
 you@your-computer your/path/to/lambda-calculus-interpreter
+```
+
+### Minimization
+In programs folder there is min.txt which implements this example so 2 code samples will be presented here.
+#### interactive coding
+```
+LCI> :import comp
+LCI> f = \x. minus 6 (mult 2 x)
+LCI> cond = \x. eq (f x) 0
+LCI> x0 = M cond
+LCI> x0
+----- β normal form : λf.λx.(f (f (f x)))
+----- α-equivalent  : 3
+LCI>
+```
+#### running the program
+```
+LCI> :run programs/min.txt
+zero of f(x) = 6-2x is...
+----- β normal form : λf.λx.(f (f (f x)))
+----- α-equivalent  : 3
+LCI> 
 ```

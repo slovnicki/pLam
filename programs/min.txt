@@ -10,15 +10,14 @@
 
 -- define function f
 f = \x. minus 6 (mult 2 x)
+
 -- define zero condition, f(x) = 0
 cond = \x. eq (f x) 0
 
-:print calculating...
-
--- calculate minimum x for condition to hold
+-- x0 is minimum value such that cond holds
 x0 = M cond
 
-:print zero of f(x) = 6-2x is
+:print zero of f(x) = 6-2x is...
 
 -- show x0
 x0
