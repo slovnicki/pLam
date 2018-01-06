@@ -1,0 +1,60 @@
+-------------------------------------------
+--            BINARY LIBRARY             --
+-------------------------------------------
+-- a library for handling 4-bit          -- 
+-- positive integers                     --
+-------------------------------------------
+
+---------------- BOOLEANS -----------------
+T = \x y. x
+F = \x y. y
+not = \x. x F T
+and = \x y. x y F
+and4 = \x y z w. and (and (and x y) z) w
+or = \x y. x T y
+or4 = \x y z w. or (or (or x y) z) w
+xor = \x y. x (not y) y
+xor3 = \x y z. xor (xor x y) z
+if = \p x y. p x y
+same = \x y. x y (not y)
+
+-------------- CONSTRUCTION ---------------
+BN4 = \a b c d B. B a b c d 
+b0 = \B. B (\a b c d. a)
+b1 = \B. B (\a b c d. b)
+b2 = \B. B (\a b c d. c) 
+b3 = \B. B (\a b c d. d)
+
+--------------- OPERATORS -----------------
+BN4add = \x y. BN4 (xor (b0 x) (b0 y)) (xor (xor (b1 x) (b1 y)) (and (b0 x) (b0 y))) (xor (xor (b2 x) (b2 y)) (and (b1 x) (b1 y))) (xor (xor (b3 x) (b3 y)) (and (b2 x) (b2 y)))
+fts = \x y. x F (y T F)
+BN4sub = \x y. BN4 (xor (b0 x) (b0 y)) (xor (b1 x) (xor (b1 y) (fts (b0 x) (b0 y)))) (xor (b2 x) (xor (b2 y) (fts (b1 x) (b1 y)))) (xor (b3 x) (xor (b3 y) (fts (b2 x) (b2 y))))
+
+BN4Lshift = \n. BN4 F (b0 n) (b1 n) (b2 n)
+BN4mulbit = \n b. b n (BN4 F F F F)
+BN4mul = \m n. BN4add (BN4add (BN4add (BN4mulbit m (b0 n)) (BN4Lshift (BN4mulbit m (b1 n)))) (BN4Lshift (BN4Lshift (BN4mulbit m (b2 n))))) (BN4Lshift (BN4Lshift (BN4Lshift (BN4mulbit m (b2 n))))))
+
+--------------- PREDICATES ----------------
+is0 = \n. not (n or4)
+leq = \m n. is0 (BN4sub m n)
+eq = \m n. and4 (same (b0 m) (b0 n))) (same (b1 m) (b1 n))) (same (b2 m) (b2 n))) (same (b3 m) (b3 n)))
+
+
+-- some numbers for testing
+n0 = BN4 F F F F
+n1 = BN4 T F F F
+n2 = BN4 F T F F
+n3 = BN4 T T F F
+n4 = BN4 F F T F
+n5 = BN4 T F T F
+n6 = BN4 F T T F
+n7 = BN4 T T T F
+n8 = BN4 F F F T
+n9 = BN4 T F F T
+n10 = BN4 F T F T
+n11 = BN4 T T F T
+n12 = BN4 F F T T
+n13 = BN4 T F T T
+n14 = BN4 F T T T
+n15 = BN4 T T T T
+
