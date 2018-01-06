@@ -21,27 +21,26 @@ convertToName [] abs@(Abstraction v e) = do
     case numeral of
         "none" -> "none"
         otherwise -> numeral
-convertToName [] ex = "none"
+convertToName [] exp = "none"
 convertToName ((v,e):rest) ex 
     | alphaEquiv e ex = v
     | otherwise       = convertToName rest ex
 
 convertToNames :: Environment -> Expression -> String
+-- convertToNames env (EnvironmentVar v) = show v IMPOSSIBLE
 convertToNames env (Variable v) = show v
 convertToNames env app@(Application m n) = do
-    --let app1 = trace ("app " ++ show m ++ " : " ++ show n) (convertToName env app)
+    --let app1 = trace ("app " ++ show m ++ " : " ++ show n ++ " :- " ++ (convertToName env app)) (convertToName env app)
     let app1 = convertToName env app
     case app1 of
         "none" -> "(" ++ (convertToNames env m) ++ " " ++ (convertToNames env n) ++ ")"
         otherwise -> app1
-        --otherwise -> trace (" ------> " ++ app1) app1
 convertToNames env abs@(Abstraction v e) = do
-    --let abs1 = trace ("abs " ++ show v ++ " : " ++ show e) (convertToName env abs)
+    --let abs1 = trace ("abs " ++ show v ++ " : " ++ show e ++ " :- " ++ (convertToName env abs)) (convertToName env abs)
     let abs1 = convertToName env abs
     case abs1 of
         "none" -> "(λ" ++ (show v) ++ ". " ++ (convertToNames env e) ++ ")"
         otherwise -> abs1
-        --otherwise -> trace (" ------> " ++ abs1) abs1
 
 isDefined :: Environment -> String -> Bool
 isDefined [] s = False
@@ -62,7 +61,10 @@ findNumeral :: Expression -> Int -> String
 findNumeral app@(Application e1 id') num = do
     case (alphaEquiv e1 id') of
         True -> "none"
-        False -> findNumeral (betaReduction app) num
+        False -> do
+            case num>=10 of
+                True -> "none"
+                False -> findNumeral (betaReduction app) (num+1)
 findNumeral exp num = do
     case (alphaEquiv exp id') of
         True -> show num
@@ -80,10 +82,8 @@ showResult :: Environment -> Expression -> InputT IO ()
 showResult env exp = do
     let bnf = betaNF exp
     outputStrLn ("----- β normal form : " ++ show bnf)
-    let name = convertToName env bnf
-    case name of
-        "none" -> outputStr ""
-        otherwise -> outputStrLn ("----- α-equivalent  : " ++ name)
+    let name = convertToNames env bnf
+    outputStrLn ("----- α-equivalent  : " ++ name)
     
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
