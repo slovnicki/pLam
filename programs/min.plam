@@ -9,13 +9,13 @@
 :import comp
 
 -- define function f
-f = \x. minus 6 (mult 2 x)
+f = \x. sub 6 (mult 2 x)
 
 -- define zero condition, f(x) = 0
 cond = \x. eq (f x) 0
 
 -- x0 is minimum value such that cond holds
-x0 = M cond
+x0 = Min cond
 
 :print zero of f(x) = 6-2x is...
 

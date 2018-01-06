@@ -1,9 +1,18 @@
 -------------------------------------
 --           ARITHMETIC            --
 -------------------------------------
+
 succ = \n f x. f (n f x)
-plus = \m n f x. (m f (n f x))
+pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
+add = \m n f x. (m f (n f x))
+sub = \m n. (n pred) m
 mult = \m n f. m (n f)
 exp = \m n. n m
-pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
-minus = \m n. (n pred) m
+
+T = \x y. x
+F = \x y. y
+and = \x y. x y F
+--------------- PREDICATES ----------------
+isZero = \n. n (\x. F) T
+leq = \m n. isZero (sub m n)
+eq = \m n. and (leq m n) (leq n m)

@@ -1,6 +1,0 @@
--------------------------------------
---           PREDICATES            --
--------------------------------------
-isZero = \n. n (\x. false) true
-leq = \m n. isZero (minus m n)
-eq = \m n. and (leq m n) (leq n m)

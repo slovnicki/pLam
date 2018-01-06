@@ -9,7 +9,7 @@
 -------------------------------------
 id = \x. x
 :print 5 - 4 is:
-(id (minus 5 4))
+(id (sub 5 4))
 :print is 3 equal to 0?
 (isZero 3)
 :print is 1 less than or equal to 2?

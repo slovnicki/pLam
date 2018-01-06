@@ -16,4 +16,4 @@ I = \x. x
 PR = \G H. Y (\f k x. (isZero k) (G x) (H (pred k) x (f ((pred k) x))))
 
 --------------- MINIMIZATION --------------
-M = \P. (Y (\h z. (P z) z (h (succ z)))) 0
+Min = \P. (Y (\h z. (P z) z (h (succ z)))) 0
