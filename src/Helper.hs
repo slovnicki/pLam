@@ -67,7 +67,7 @@ findNumeral app@(Application e1 id') num = do
                 False -> findNumeral (betaReduction app) (num+1)
 findNumeral exp num = do
     case (alphaEquiv exp id') of
-        True -> show num
+        True -> show (num-1)
         False -> do
             case (hasBetaRedex exp) of
                 True -> do
