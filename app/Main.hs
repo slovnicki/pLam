@@ -22,7 +22,7 @@ execAll (line:ls) env =
                 return env
             Right comm -> case comm of   
                 Import f -> do
-                    content <- liftIO $ readFile ("import/" ++ f ++ ".txt")
+                    content <- liftIO $ readFile ("import/" ++ f ++ ".plam")
                     let exprs = lines content
                     env' <- execAll exprs env
                     execAll ls env'
@@ -81,7 +81,7 @@ execute line env =
                                 otherwise -> showResult env exp
                     return env
                 Import f -> do
-                    content <- liftIO $ readFile ("import/" ++ f ++ ".txt")
+                    content <- liftIO $ readFile ("import/" ++ f ++ ".plam")
                     let exprs = lines content
                     execAll exprs env                  
                 Review r -> do
