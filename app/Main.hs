@@ -106,14 +106,21 @@ execute line env =
                    -- MAIN with Read-Evaluate-Print Loop --
 -------------------------------------------------------------------------------------
 main :: IO ()
-main = runInputT defaultSettings (repl []) 
-    where
+main = 
+    trace ("\x1b[1;36m\
+\         _\n\
+\        | |\n\
+\    ____| |   ___  __  __\n\
+\    | _ \\ |__| _ \\|  \\/  |\n\
+\    |  _/____|____\\_\\__/_| \x1b[32mv0.1.0\n\
+\    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
+\   \x1b[1;36m=================================\n") (runInputT defaultSettings (repl [])) where
         repl env = do
-            mline <- getInputLine "LCI> "
+            mline <- getInputLine "\x1b[1;36mpLam>\x1b[0m "
             case mline of
                 Nothing -> return ()
                 Just ":quit" -> do
-                    outputStrLn "Goodbye!"
+                    outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
                     return ()
                 Just line -> do
                     env' <- execute line env
