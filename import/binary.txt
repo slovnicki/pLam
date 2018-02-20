@@ -1,0 +1,31 @@
+-------------------------------------------
+--             BINARY LIBRARY            --
+-------------------------------------------
+:import std
+:import list
+
+---------- BINARY REPRESENTATION ----------
+b0 = \z w. z
+b1 = \z w. w
+b2 = \z w. z w
+b3 = \z w. w w
+b4 = \z w. z z w
+-- ...
+
+---------------- ZERO TEST ----------------
+Mz = \m b B. pair m (and b B)
+DF = pair Mz F
+DT = pair Mz T
+
+bZero = \n. second (n DT DF)
+
+---------------- SUCCESSOR ----------------
+I = \x. x
+tuple4 = \x y z w. pair (pair (pair x y) z) w 
+Msucc = \m B R S b r s. (s (b (B (tuple4 m B (r T) F) (tuple4 m B (r T) F) (r T)) (B (tuple4 m B (r F) T) (tuple4 m B (r F) T) (r F T)) I) (b (B (tuple4 m B (r F) F) (tuple4 m B (r F) F) (r F)) (B (tuple4 m B (r T) F) (tuple4 m B (r T) F) (r T)) I))
+bSucc = \n z w. (n (tuple4 Msucc (\x y z. x) I T) (tuple4 Msucc (\x y z. y) I T) (tuple4 Msucc (\x y z. z) I T))
+
+
+
+
+

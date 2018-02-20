@@ -41,7 +41,7 @@ execAll (line:ls) env =
                             return env
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
-                            showResult env exp
+                            showResult env exp 0
                             execAll ls env'
                 Print s -> do
                     outputStrLn s
@@ -65,7 +65,7 @@ execute line env =
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> outputStrLn $ show err
-                        Right exp -> showResult env exp
+                        Right exp -> showResult env exp 0
                     return env
                 ShowDetailed e -> do
                     let (res, env') = (evalExp e) `runState` env
@@ -78,7 +78,7 @@ execute line env =
                                 Just "a" -> autoReduce env exp 0
                                 Just "m" -> manualReduce env exp 0
                                 Just "t" -> drawPossibleReductions exp
-                                otherwise -> showResult env exp
+                                otherwise -> showResult env exp 0
                     return env
                 Import f -> do
                     content <- liftIO $ readFile ("import/" ++ f ++ ".plam")
