@@ -34,7 +34,7 @@ stack build
 ```
 5. use stack to run project executable
 ```
-stack exec lci
+stack exec plam
 ```
 
 ## Examples:
@@ -55,10 +55,10 @@ NOTE: Output might be slightly different due to constant fixes and changes.
 pLam> :import booleans
 pLam> 
 pLam> and (not F) (or (xor F T) F)
------ β normal form : λx.λy.x
------ α-equivalent  : T
-pLam> :quit
-Goodbye!
+----- reductions count : 14
+----- β normal form    : λx.λy.x
+----- α-equivalent     : T
+pLam>
 ```
 
 ### Fun with arithmetic
@@ -71,13 +71,12 @@ Goodbye!
     |_| pure λ-calculus interpreter
    =================================
 
-pLam> :import arithmetic
-pLam> 
-pLam> eq 3 (add 2 1)
------ β normal form : λx.λy.x
------ α-equivalent  : T
-pLam> :quit
-Goodbye!
+pLam> :import std
+pLam> sub (add 3 2) 1
+----- reductions count : 24
+----- β normal form    : λf.λx.(f (f (f (f x))))
+----- α-equivalent     : 4
+pLam>
 ```
 
 ### Factorial
@@ -91,21 +90,20 @@ Goodbye!
    =================================
 
 pLam> :import std
-pLam> 
-pLam> Y = \f. (\x. f(x x)) (\x. f(x x))
-pLam> fact = Y (\f n. (isZero n) 1 (mult n (f (pred n))))
-pLam> 
+pLam> :import comp
+pLam> fact = PR0 1 mul
 pLam> fact 3
------ β normal form : λf.λx.(f (f (f (f (f (f x))))))
------ α-equivalent  : 6
-pLam> :quit
-Goodbye!
+----- reductions count : 647
+----- β normal form    : λf.λx.(f (f (f (f (f (f x))))))
+----- α-equivalent     : 6
+pLam>
 ```
 
 ### Minimization
+Detailed description of what is going on is given in programs/min.plam as comments.
 #### interactive coding:
 ```
-         _
+        _
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
@@ -113,18 +111,19 @@ Goodbye!
     |_| pure λ-calculus interpreter
    =================================
 
+pLam> :import std
 pLam> :import comp
 pLam> 
-pLam> f = \x. sub 6 (mult 2 x)
-pLam> condition = \x. eq (f x) 0
-pLam> x0 = Min condition
+pLam> f = \x. sub 6 (mul 2 x)
+pLam> cond = \x y. sub (f x) y
+pLam> find = MIN cond
+pLam> x0 = find 0
 pLam> 
 pLam> x0
------ β normal form : λf.λx.(f (f (f x)))
------ α-equivalent  : 3
+----- reductions count : 292
+----- β normal form    : λf.λx.(f (f (f x)))
+----- α-equivalent     : 3
 pLam>
-pLam> :quit
-Goodbye!
 ```
 #### running the existing program:
 ```
@@ -138,10 +137,10 @@ Goodbye!
 
 pLam> :run programs/min.plam
 zero of f(x) = 6-2x is...
------ β normal form : λf.λx.(f (f (f x)))
------ α-equivalent  : 3
-pLam> :quit
-Goodbye!
+----- reductions count : 292
+----- β normal form    : λf.λx.(f (f (f x)))
+----- α-equivalent     : 3
+pLam>
 ```
 
 ### Binary numerals
@@ -154,21 +153,22 @@ Goodbye!
     |_| pure λ-calculus interpreter
    =================================
 
-pLam> :import binary
-pLam>
-pLam> n11
------ β normal form : λB.((((B λx.λy.x) λx.λy.x) λx.λy.y) λx.λy.x)
------ α-equivalent  : (λB. ((((B T) T) F) T))
-pLam>
-pLam>
-pLam> BN4add n2 n3
------ β normal form : λB.((((B λx.λy.x) λx.λy.y) λx.λy.x) λx.λy.y)
------ α-equivalent  : (λB. ((((B T) F) T) F))
-pLam>
-pLam> BN4sub n13 n10
------ β normal form : λB.((((B λx.λy.x) λx.λy.x) λx.λy.y) λx.λy.y)
------ α-equivalent  : (λB. ((((B T) T) F) F))
+pLam> -- first, let's try sub with Church numerals to see the reductions count
+pLam> :import std
+pLam> sub 255 4
+----- reductions count : 2051
+----- β normal form    : λf.λx.(f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f x)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+----- α-equivalent     : 251
 pLam> 
+pLam> -- now the binary version
+pLam> -- NOTE: operations on this representation of numerals have reduction complexity dependant just on the number of bits of larger operand
+pLam> :import binary
+pLam> bin4 = pair F (pair F (pair T end))
+pLam> bin255 = make8b T T T T T T T T
+pLam> subBv bin255 bin4
+----- reductions count : 1950
+----- β normal form    : λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.y) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λe.λx.λy.x))))))))
+----- α-equivalent     : λp.((p T) λp.((p T) λp.((p F) λp.((p T) λp.((p T) λp.((p T) λp.((p T) λp.((p T) end))))))))
 pLam> :quit
 Goodbye!
 ```
