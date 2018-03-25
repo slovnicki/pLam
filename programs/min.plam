@@ -5,17 +5,21 @@
 --   find zero of f(x) = 6-2x
 ----------------------------------------------
 
--- import everything from comp.txt library
+-- import everything from std and comp library
+:import std
 :import comp
 
--- define function f
-f = \x. sub 6 (mult 2 x)
+-- define function f(x) = 6-2x
+f = \x. sub 6 (mul 2 x)
 
--- define zero condition, f(x) = 0
-cond = \x. eq (f x) 0
+-- define condition f(x) - y = 0
+cond = \x y. sub (f x) y
 
--- x0 is minimum value such that cond holds
-x0 = Min cond
+-- minimize the condition 
+find = MIN cond
+
+-- x0 is the least x such that f(x)=0 holds
+x0 = find 0
 
 :print zero of f(x) = 6-2x is...
 
