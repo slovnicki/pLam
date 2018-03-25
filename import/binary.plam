@@ -1,60 +1,90 @@
 -------------------------------------------
 --            BINARY LIBRARY             --
--------------------------------------------
--- a library for handling 4-bit          -- 
--- positive integers                     --
--------------------------------------------
+--=======================================--
+
+-- TODO: negative numerals
 
 ---------------- BOOLEANS -----------------
 T = \x y. x
 F = \x y. y
 not = \x. x F T
 and = \x y. x y F
-and4 = \x y z w. and (and (and x y) z) w
 or = \x y. x T y
-or4 = \x y z w. or (or (or x y) z) w
+or3 = \x y z. or (or x y) z
 xor = \x y. x (not y) y
 xor3 = \x y z. xor (xor x y) z
-if = \p x y. p x y
-same = \x y. x y (not y)
+-------------------------------------------
 
--------------- CONSTRUCTION ---------------
-BN4 = \a b c d B. B a b c d 
-b0 = \B. B (\a b c d. a)
-b1 = \B. B (\a b c d. b)
-b2 = \B. B (\a b c d. c) 
-b3 = \B. B (\a b c d. d)
+pair = \x y p. p x y
+fst = \p. p T
+snd = \p. p F
 
---------------- OPERATORS -----------------
-BN4add = \x y. BN4 (xor (b0 x) (b0 y)) (xor (xor (b1 x) (b1 y)) (and (b0 x) (b0 y))) (xor (xor (b2 x) (b2 y)) (and (b1 x) (b1 y))) (xor (xor (b3 x) (b3 y)) (and (b2 x) (b2 y)))
-fts = \x y. x F (y T F)
-BN4sub = \x y. BN4 (xor (b0 x) (b0 y)) (xor (b1 x) (xor (b1 y) (fts (b0 x) (b0 y)))) (xor (b2 x) (xor (b2 y) (fts (b1 x) (b1 y)))) (xor (b3 x) (xor (b3 y) (fts (b2 x) (b2 y))))
-
-BN4Lshift = \n. BN4 F (b0 n) (b1 n) (b2 n)
-BN4mulbit = \n b. b n (BN4 F F F F)
-BN4mul = \m n. BN4add (BN4add (BN4add (BN4mulbit m (b0 n)) (BN4Lshift (BN4mulbit m (b1 n)))) (BN4Lshift (BN4Lshift (BN4mulbit m (b2 n))))) (BN4Lshift (BN4Lshift (BN4Lshift (BN4mulbit m (b2 n))))))
-
---------------- PREDICATES ----------------
-is0 = \n. not (n or4)
-leq = \m n. is0 (BN4sub m n)
-eq = \m n. and4 (same (b0 m) (b0 n))) (same (b1 m) (b1 n))) (same (b2 m) (b2 n))) (same (b3 m) (b3 n)))
+-- this represents the end of the list
+end = \e. T
+isEnd = \p. p (\x y. F)
 
 
--- some numbers for testing
-n0 = BN4 F F F F
-n1 = BN4 T F F F
-n2 = BN4 F T F F
-n3 = BN4 T T F F
-n4 = BN4 F F T F
-n5 = BN4 T F T F
-n6 = BN4 F T T F
-n7 = BN4 T T T F
-n8 = BN4 F F F T
-n9 = BN4 T F F T
-n10 = BN4 F T F T
-n11 = BN4 T T F T
-n12 = BN4 F F T T
-n13 = BN4 T F T T
-n14 = BN4 F T T T
-n15 = BN4 T T T T
+--========== TESTING ==========--
+-- constructor for 4-bit numerals
+make4b = \x y z w. pair x (pair y (pair z (pair w end)))
+
+-- 4-bit numerals for testing
+B0 = make4b F F F F
+B1 = make4b T F F F
+B2 = make4b F T F F
+B3 = make4b T T F F
+B4 = make4b F F T F
+B5 = make4b T F T F
+B6 = make4b F T T F
+B7 = make4b T T T F
+
+-- 6-bit numerals for testing
+make6b = \a b c d e f. pair a (pair b (pair c (pair d (pair e (pair f end)))))
+
+B53 = make6b T F T F T T
+B12 = make6b F F T T F F
+
+-- 8-bit numerals for testing
+make8b = \a b c d e f g h. pair a (pair b (pair c (pair d (pair e (pair f (pair g (pair h end)))))))
+
+B85 = make8b T F T F T F T F
+B204 = make8b F F T T F F T T
+--=============================--
+
+
+-- Y combinator
+Y = \f. (\x. f(x x)) (\x. f(x x))
+
+-- constant size addition
+carrya = \x y c. or (and x y) (and (or x y) c)
+addB0 = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
+addB = \x y. addB0 x y F
+
+-- variant size addition
+fork = \x y a b c. (and (isEnd x) (isEnd y)) end ((isEnd x) a ((isEnd y) b c))
+
+-- a = pair (xor3 F (fst y) c) (f end (snd y) (carryav F (fst y) c))
+-- b = pair (xor3 (fst x) F c) (f (snd x) end (carryav (fst x) F c))
+-- c = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryav (fst x) (fst y) c))
+
+addB0v = Y (\f. \x y c. fork x y (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
+addBv = \x y. addB0v x y F
+
+-- substraction
+carrys = \x y c. or (and (not x) y) (and (not (or x y)) c)
+subB0 = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
+subB = \x y. subB0 x y F
+
+-- variant substraction
+subB0v = Y (\f. \x y c. fork x y (pair (xor3 F (fst y) c) (f end (snd y) (carrys F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrys (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
+subBv = \x y. subB0v x y F
+
+
+-- successor
+SB = \x. addBv x (pair T end)
+
+-- predecessor
+PB = \x. subBv x (pair T end)
+
+
 
