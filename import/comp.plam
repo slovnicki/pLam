@@ -42,6 +42,7 @@ PR1 = \G H. (Y (\f x k. (isZ k) (G x) (H x (P k) (f x (P k)))))
 --==========================================--
                 MINIMIZATION 
 --==========================================--
-MIN = \G. (Y (\h x y. (isZ (G x y)) y (h x (S y))) 0)
+MINx = \G. (Y (\h. \x y. (isZ (G x y)) x (h (S x) y)))
+MIN = \G. MINx G 0
 
 
