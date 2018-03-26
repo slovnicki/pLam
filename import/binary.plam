@@ -88,4 +88,12 @@ SB = \x. addBv x (pair T end)
 PB = \x. subBv x (pair T end)
 
 
+-- multiplication
+mulb = Y (\f. \x b. (isEnd x) end (pair (and (fst x) b) (f (snd x) b)))
+shiftr = \x. pair F x
+mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (shiftr (addBv s (mulb x (fst y))))))
+mulB = \x y. mulB0 x y :b0
+
+
+
 
