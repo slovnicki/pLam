@@ -80,6 +80,9 @@ forks = \x y A B C. (and (isEnd x) (isEnd y)) end ((isEnd x) A ((isEnd y) B C))
 subB0v = Y (\f. \x y c. forks x y (pair (xor3 F (fst y) c) (f end (snd y) (carrys F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrys (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
 subBv = \x y. subB0v x y F
 
+-- test for zero
+isZeroB0 = Y (\f. \x b. (isEnd x) b (or (fst x) (f (snd x) b)))
+isZeroB = \x. not (isZeroB0 x F)
 
 -- successor
 SB = \x. addBv x (pair T end)
@@ -93,7 +96,5 @@ mulb = Y (\f. \x b. (isEnd x) end (pair (and (fst x) b) (f (snd x) b)))
 shiftr = \x. pair F x
 mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (shiftr (addBv s (mulb x (fst y))))))
 mulB = \x y. mulB0 x y :b0
-
-
 
 
