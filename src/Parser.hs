@@ -20,6 +20,7 @@ languageDef =
                                        , ":run"
                                        , ":print"
                                        , ":d"
+                                       , ":b"
                                        ]
              , Token.reservedOpNames = [ "="
                                        , "." 
@@ -50,6 +51,20 @@ filename = many1 $ letter <|> symbol <|> digit
 fromNumber :: Int -> Expression -> Expression
 fromNumber 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
 fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
+
+-- HELP EXPRS --
+true = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Variable (LambdaVar 'x' 0)))
+false = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Variable (LambdaVar 'y' 0)))
+pair = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Abstraction (LambdaVar 'p' 0) (Application (Application (Variable (LambdaVar 'p' 0)) (Variable (LambdaVar 'x' 0))) (Variable (LambdaVar 'y' 0)))))
+end = Abstraction (LambdaVar 'e' 0) true
+whichBit :: Int -> Expression
+whichBit b
+    | b == 0    = false
+    | otherwise = true
+----------------
+fromBinary :: Int -> Expression
+fromBinary 0 = end
+fromBinary n = Application (Application (pair) (whichBit (mod n 2))) (fromBinary (quot n 2))  
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -58,6 +73,13 @@ parseChurch = do
     strNum <- many1 digit
     let intNum = read strNum :: Int
     return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
+
+parseBinary :: Parser Expression
+parseBinary = do
+    reservedOp ":b"
+    strNum <- many1 digit
+    let intNum = read strNum :: Int
+    return (fromBinary intNum)
 
 parseVariable :: Parser Expression
 parseVariable = do
@@ -90,6 +112,7 @@ parseExpression =  parens parseApplication
 
 parseSingleton :: Parser Expression
 parseSingleton =  parseChurch
+              <|> parseBinary
               <|> parseVariable
               <|> parseAbstraction
               <|> parens parseApplication
