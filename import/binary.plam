@@ -57,17 +57,17 @@ Y = \f. (\x. f(x x)) (\x. f(x x))
 
 -- constant size addition
 carrya = \x y c. or (and x y) (and (or x y) c)
-addB0 = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
+addB0 = Y (\f. \x y c. (isEnd x) (c (pair T end) end) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
 addB = \x y. addB0 x y F
 
 -- variant size addition
-fork = \x y a b c. (and (isEnd x) (isEnd y)) end ((isEnd x) a ((isEnd y) b c))
+forka = \x y c A B C. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) A ((isEnd y) B C))
 
--- a = pair (xor3 F (fst y) c) (f end (snd y) (carryav F (fst y) c))
--- b = pair (xor3 (fst x) F c) (f (snd x) end (carryav (fst x) F c))
--- c = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryav (fst x) (fst y) c))
+-- A = pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))
+-- B = pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))
+-- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))
 
-addB0v = Y (\f. \x y c. fork x y (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
+addB0v = Y (\f. \x y c. forka x y c (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
 addBv = \x y. addB0v x y F
 
 -- substraction
@@ -76,7 +76,8 @@ subB0 = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (
 subB = \x y. subB0 x y F
 
 -- variant substraction
-subB0v = Y (\f. \x y c. fork x y (pair (xor3 F (fst y) c) (f end (snd y) (carrys F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrys (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
+forks = \x y A B C. (and (isEnd x) (isEnd y)) end ((isEnd x) A ((isEnd y) B C))
+subB0v = Y (\f. \x y c. forks x y (pair (xor3 F (fst y) c) (f end (snd y) (carrys F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrys (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
 subBv = \x y. subB0v x y F
 
 
