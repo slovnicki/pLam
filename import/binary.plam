@@ -61,13 +61,14 @@ addB0 = Y (\f. \x y c. (isEnd x) (c (pair T end) end) (pair (xor3 (fst x) (fst y
 addB = \x y. addB0 x y F
 
 -- variant size addition
-forka = \x y c A B C. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) A ((isEnd y) B C))
+forkA = \x y c. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c)))))
 
--- A = pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))
--- B = pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))
--- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))
+-- E = c (pair T end) end
+-- M = pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))
+-- N = pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))
+-- L = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))
 
-addB0v = Y (\f. \x y c. forka x y c (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
+addB0v = Y (\f. forkA)
 addBv = \x y. addB0v x y F
 
 -- substraction
@@ -96,5 +97,8 @@ mulb = Y (\f. \x b. (isEnd x) end (pair (and (fst x) b) (f (snd x) b)))
 shiftr = \x. pair F x
 mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (shiftr (addBv s (mulb x (fst y))))))
 mulB = \x y. mulB0 x y :b0
+
+-- primitive recursion, version 0
+PR0 = \G H. (Y (\f k. (isZeroB k) G (H k (f (PB k)))))
 
 
