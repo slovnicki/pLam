@@ -2,7 +2,11 @@
 --            BINARY LIBRARY             --
 --=======================================--
 
--- TODO: negative numerals
+-- TODO:
+---- features   : negative numerals
+---- operations : div, mod
+---- fixes      : mul
+
 
 ---------------- BOOLEANS -----------------
 T = \x y. x
@@ -15,6 +19,7 @@ xor = \x y. x (not y) y
 xor3 = \x y z. xor (xor x y) z
 -------------------------------------------
 
+-- pair operations
 pair = \x y p. p x y
 fst = \p. p T
 snd = \p. p F
@@ -23,79 +28,64 @@ snd = \p. p F
 end = \e. T
 isEnd = \p. p (\x y. F)
 
-
---========== TESTING ==========--
--- constructor for 4-bit numerals
-make4b = \x y z w. pair x (pair y (pair z (pair w end)))
-
--- 4-bit numerals for testing
-B0 = make4b F F F F
-B1 = make4b T F F F
-B2 = make4b F T F F
-B3 = make4b T T F F
-B4 = make4b F F T F
-B5 = make4b T F T F
-B6 = make4b F T T F
-B7 = make4b T T T F
-
--- 6-bit numerals for testing
-make6b = \a b c d e f. pair a (pair b (pair c (pair d (pair e (pair f end)))))
-
-B53 = make6b T F T F T T
-B12 = make6b F F T T F F
-
--- 8-bit numerals for testing
-make8b = \a b c d e f g h. pair a (pair b (pair c (pair d (pair e (pair f (pair g (pair h end)))))))
-
-B85 = make8b T F T F T F T F
-B204 = make8b F F T T F F T T
---=============================--
-
-
 -- Y combinator
 Y = \f. (\x. f(x x)) (\x. f(x x))
 
--- constant size addition
-carrya = \x y c. or (and x y) (and (or x y) c)
-addB0 = Y (\f. \x y c. (isEnd x) (c (pair T end) end) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))))
-addB = \x y. addB0 x y F
+
+--------------------
+--    ADDITION    --
+--================--
+carryA = \x y c. or (and x y) (and (or x y) c)
+
+-- equal size addition
+addB0e = Y (\f. \x y c. (isEnd x) (c (pair T end) end) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c))))
+addBe = \x y. addB0 x y F
 
 -- variant size addition
-forkA = \x y c. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) (pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c)))))
+forkA = \x y c. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) (pair (xor3 F (fst y) c) (f end (snd y) (carryA F (fst y) c))) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryA (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c)))))
 
 -- E = c (pair T end) end
--- M = pair (xor3 F (fst y) c) (f end (snd y) (carrya F (fst y) c))
--- N = pair (xor3 (fst x) F c) (f (snd x) end (carrya (fst x) F c))
--- L = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrya (fst x) (fst y) c))
+-- M = pair (xor3 F (fst y) c) (f end (snd y) (carryA F (fst y) c))
+-- N = pair (xor3 (fst x) F c) (f (snd x) end (carryA (fst x) F c))
+-- L = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c))
 
-addB0v = Y (\f. forkA)
-addBv = \x y. addB0v x y F
+addB0 = Y (\f. forkA)
+addB = \x y. addB0 x y F
+-------------------------------------------------
 
--- substraction
-carrys = \x y c. or (and (not x) y) (and (not (or x y)) c)
-subB0 = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
-subB = \x y. subB0 x y F
+------------------------
+--    SUBSTRACTION    --
+--====================--
+carryS = \x y c. or (and (not x) y) (and (not (or x y)) c)
+
+-- equal size substraction
+subB0e = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))))
+subBe = \x y. subB0 x y F
 
 -- variant substraction
-forks = \x y A B C. (and (isEnd x) (isEnd y)) end ((isEnd x) A ((isEnd y) B C))
-subB0v = Y (\f. \x y c. forks x y (pair (xor3 F (fst y) c) (f end (snd y) (carrys F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carrys (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carrys (fst x) (fst y) c))))
-subBv = \x y. subB0v x y F
+forkS = \x y A B C. (and (isEnd x) (isEnd y)) end ((isEnd x) A ((isEnd y) B C))
+subB0 = Y (\f. \x y c. forkS x y (pair (xor3 F (fst y) c) (f end (snd y) (carryS F (fst y) c))) (pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))))
+subB = \x y. subB0v x y F
+----------------------------------------------
 
+--------------------
+--    ADEQUACY    --
+--================--
 -- test for zero
 isZeroB0 = Y (\f. \x b. (isEnd x) b (or (fst x) (f (snd x) b)))
 isZeroB = \x. not (isZeroB0 x F)
 
 -- successor
-SB = \x. addBv x (pair T end)
+SB = \x. addB x (pair T end)
 
 -- predecessor
-PB = \x. subBv x (pair T end)
-
+PB = \x. subB x (pair T end)
+---------------------------------------------
 
 -- multiplication
 mulb = Y (\f. \x b. (isEnd x) end (pair (and (fst x) b) (f (snd x) b)))
 shiftr = \x. pair F x
-mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (shiftr (addBv s (mulb x (fst y))))))
+mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (shiftr (addB s (mulb x (fst y))))))
 mulB = \x y. mulB0 x y :b0
 
 -- primitive recursion, version 0
