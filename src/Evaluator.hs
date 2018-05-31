@@ -1,6 +1,7 @@
 module Evaluator where
 
 import Control.Monad.State
+import Data.Char
 import Debug.Trace
 
 import Syntax
@@ -15,7 +16,7 @@ evalVar a = state $ \e -> (reference a e, e) where
 
 evalAbs :: LambdaVar -> Expression -> Program (Failable Expression)
 evalAbs x@(LambdaVar n i) y = do
-    modify(([n] ++ (showHelper i),(Variable x)):)
+    --modify(([n] ++ (showVarHelper i),(Variable x)):)
     y' <- evalExp y
     case y' of
         Left err  -> return $ Left err
@@ -33,7 +34,7 @@ evalApp f x = do
                 Right x'' -> return $ Right $ Application f'' x''                
 
 evalExp :: Expression -> Program (Failable Expression)
-evalExp (Variable (LambdaVar n i)) = evalVar [n]
+evalExp x@(Variable (LambdaVar n i)) = return $ Right x--evalVar ([n] ++ showVarHelper i)
 evalExp (Abstraction v e) = evalAbs v e
 evalExp (Application m n) = evalApp m n
 evalExp (EnvironmentVar ev) = evalVar ev

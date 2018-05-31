@@ -85,9 +85,9 @@ parseVariable :: Parser Expression
 parseVariable = do
     x <- identifier
     spaces
-    case (length x) of
-        1 -> return (Variable (LambdaVar (head x) 0))
-        otherwise -> return (EnvironmentVar x) 
+    case length x == 1 && isLower (head x) of
+        True -> return (Variable (LambdaVar (head x) 0))
+        False -> return (EnvironmentVar x) 
 
 parseAbstraction :: Parser Expression
 parseAbstraction = do
