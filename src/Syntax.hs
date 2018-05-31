@@ -9,13 +9,13 @@ data LambdaVar = LambdaVar { name :: Char
                            , index :: Int
                            } deriving (Ord,Eq)
 
-showHelper :: Int -> String
-showHelper 0 = ""
-showHelper n = "'" ++ showHelper (n-1)
+showVarHelper :: Int -> String
+showVarHelper 0 = ""
+showVarHelper n = "'" ++ showVarHelper (n-1)
 
 instance Show LambdaVar where
   show (LambdaVar c 0) = [c]
-  show (LambdaVar c i) = [c] ++ showHelper i
+  show (LambdaVar c i) = [c] ++ showVarHelper i
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -27,8 +27,8 @@ data Expression = Variable LambdaVar
 
 instance Show Expression where
     show (Variable v)        = show v
-    show (Abstraction n t)   = "\x1b[32mλ\x1b[0m" ++ show n ++ "\x1b[32m.\x1b[0m" ++ show t
-    show (Application t1 t2) = "\x1b[33m(\x1b[0m" ++ show t1 ++ " " ++ show t2 ++ "\x1b[33m)\x1b[0m"
+    show (Abstraction n t)   = "\x1b[32m(λ\x1b[0m" ++ show n ++ "\x1b[32m.\x1b[0m" ++ show t ++ "\x1b[32m)\x1b[0m"
+    show (Application t1 t2) = "\x1b[33m[\x1b[0m" ++ show t1 ++ " " ++ show t2 ++ "\x1b[33m]\x1b[0m"
     show (EnvironmentVar ev) = ev
 -------------------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ data Error = SyntaxError ParseError
 
 instance Show Error where
     show (SyntaxError se)        = show se
-    show (UndeclaredVariable uv) = " ERROR: undeclared variable " ++ show uv ++ "\n- type \"review all\" to see all environment variables you can use\n- type \"<variable name> = <lambda expression>\" to add new variables to environment"
+    show (UndeclaredVariable uv) = " ERROR: undeclared variable " ++ show uv ++ "\n- type \":review all\" to see all environment variables you can use\n- type \"" ++ uv ++ " = <lambda expression>\" to add this variables to environment"
     show (FatalError fe)         = show fe
 
 type Failable = Either Error
