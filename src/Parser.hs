@@ -95,7 +95,7 @@ parseAbstraction = do
   xs <- endBy1 letter spaces
   reservedOp "."
   spaces
-  body <- parseApplication
+  body <- parseExpression
   return $ curry xs body where
         curry (x:xs) body = Abstraction (LambdaVar x 0) $ curry xs body
         curry [] body     = body
@@ -105,17 +105,16 @@ parseApplication = do
   es <- sepBy1 parseSingleton spaces
   return $ foldl1 Application es
 
-parseExpression :: Parser Expression
-parseExpression =  parens parseApplication
-               <|> parseApplication
-               <|> parseSingleton
-
 parseSingleton :: Parser Expression
 parseSingleton =  parseChurch
               <|> parseBinary
               <|> parseVariable
               <|> parseAbstraction
               <|> parens parseApplication
+
+parseExpression :: Parser Expression
+parseExpression =  parseApplication
+               <|> parseSingleton
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
