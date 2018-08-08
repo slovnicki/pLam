@@ -56,6 +56,6 @@ PR1 = \g h. Y (\f x y. (isZ y) (g x) (h x (P y) (f x (P y))))
 MIN1x = \g. Y (\h x. (isZ (g x)) x (h (S x)))
 MIN1 = \g. MIN1x g 0
 MIN2x = \g. Y (\h x y. (isZ (g x y)) y (h x (S y)))
-MIN2 = \g. \x. MINx g x 0
+MIN2 = \g. \x. MIN2x g x 0
 
 
