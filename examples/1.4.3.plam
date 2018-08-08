@@ -1,0 +1,16 @@
+----------------------------
+-- example 1.4.3; booleans
+----------------------------
+
+T = \x y. x
+F = \x y. y
+ 
+not = \x. x F T
+and = \x y. x y F
+or = \x y. x T y
+xor = \x y. x (not y) y
+
+:print =================================\n
+:print < and (or F (not F)) (xor T F)
+:print =================================\n
+and (or F (not F)) (xor T F)

@@ -1,0 +1,14 @@
+---------------------------------------
+-- example 2.5.5; minimizing function
+---------------------------------------
+
+:import comp
+:import std
+
+fun = \x. mul (sub 2 x) (sub 3 x)
+zero = MIN1 fun
+ 
+:print =================================\n
+:print < zero
+:print =================================\n
+zero

@@ -1,0 +1,29 @@
+-------------------------------------
+-- example 2.5.3; church comparison
+-------------------------------------
+
+T = \x y. x
+F = \x y. y
+and = \x y. x y F
+
+pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
+sub = \m n. (n pred) m
+
+isZero = \n. n (\x. F) T
+leq = \m n. isZero (sub m n)
+eq = \m n. and (leq m n) (leq n m)
+
+:print =================================\n
+:print < eq 4 5
+:print =================================\n
+eq 4 5
+
+:print =================================\n
+:print < eq 5 5
+:print =================================\n
+eq 5 5
+
+:print =================================\n
+:print < eq 5 4
+:print =================================\n
+eq 5 4
