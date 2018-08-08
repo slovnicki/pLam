@@ -2,7 +2,7 @@
 --            BINARY LIBRARY             --
 --=======================================--
 
--- TODO:
+-- TODO wishes:
 ---- features   : negative numerals
 ---- operations : div, mod
 ---- fixes      : mul, mulb simplify, sub a b (a<b), sub L, carry
@@ -26,7 +26,10 @@ snd = \p. p F
 
 -- this represents the end of the list
 end = \e. T
-isEnd = \p. p (\x y. F)
+isEnd = \e. e (\x y. F)
+-- this represents that numeral should be zero
+numZ = \x y. T
+isNumZ = \z. z F F
 
 -- Y combinator
 Y = \f. (\x. f(x x)) (\x. f(x x))
@@ -63,29 +66,33 @@ subB0e = Y (\f. \x y c. (isEnd x) end (pair (xor3 (fst x) (fst y) c) (f (snd x) 
 subBe = \x y. subB0e x y F
 
 -- variant substraction
-forkS = \x y c. (and (isEnd x) (isEnd y)) end ((isEnd x) end ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c)))))
+forkS = \x y c. (and (isEnd x) (isEnd y)) (c (pair numZ end) end) ((isEnd x) (pair numZ end) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c)))))
 
--- E = end
--- M = end
--- N = pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))
--- L = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
+-- E = c (pair numZ end) end
+-- A = pair numZ end
+-- B = pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))
+-- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
+
+-- whether a binary numeral has numZ bit
+hasZ = Y (\f. \x. (isEnd x) F ((isNumZ (fst x)) T (f (snd x))))
+makeZ = \x. (hasZ x) :b0 x
 
 subB0 = Y (\f. forkS)
 subB = \x y. subB0 x y F
+subsB = \x y. makeZ (subB0 x y F)
 ----------------------------------------------
 
 --------------------
 --    ADEQUACY    --
 --================--
 -- test for zero
-isZeroB0 = Y (\f. \x b. (isEnd x) b (or (fst x) (f (snd x) b)))
-isZeroB = \x. not (isZeroB0 x F)
+isZeroB = Y (\f. \x. (isEnd x) T ((fst x) F (f (snd x))))
 
 -- successor
-SB = \x. addB x (pair T end)
+SB = \x. addB x :b1
 
 -- predecessor
-PB = \x. subB x (pair T end)
+PB = \x. subB x :b1
 ---------------------------------------------
 
 -- multiplication
@@ -95,6 +102,6 @@ mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (addB s (shiftr (mulb x (fst y))
 mulB = \x y. mulB0 x y :b0
 
 -- primitive recursion, version 0
-PR0 = \G H. (Y (\f k. (isZeroB k) G (H k (f (PB k)))))
+--PR0 = \G H. (Y (\f k. (isZeroB k) G (H k (f (PB k)))))
 
 
