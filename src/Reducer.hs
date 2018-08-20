@@ -1,7 +1,6 @@
 module Reducer where
 
 import Control.Monad.State
-import Debug.Trace
 
 import Prelude hiding (null,filter,map,rem)
 import qualified Data.List as List
@@ -11,100 +10,126 @@ import System.Console.Haskeline
 
 import Syntax
 
-
--------------------------------------------------------------------------------------
--- a catamorphism for lambda terms
---      lambda                   app              lvar
+--------------------------------------------------------------------------------
+-- folding set operations on a lambda expression
+-- used in vars and freeVars
+---- insert and delete have same signature: (LambdaVar -> a -> a) 
+---- union has signature: (a -> a -> a)
+---- singleton has signature: (LambdaVar -> a)
+---- returns Set a
 fold :: (LambdaVar -> a -> a) -> (a -> a -> a) -> (LambdaVar -> a) -> Expression -> a
 fold _ _ h (Variable v)     = h v
 fold f g h (Abstraction v e) = f v (fold f g h e) 
 fold f g h (Application e1 e2)  = g (fold f g h e1) (fold f g h e2)
--------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- extracting all variales from a input expression
+---- returns Set of lambda variables
 vars :: Expression -> Set LambdaVar
 vars = fold insert union singleton
 
+--------------------------------------------------------------------------------
+-- extracting free variales from a input expression
+---- returns Set of lambda variables
 freeVars :: Expression -> Set LambdaVar
 freeVars = fold delete union singleton
 
+--------------------------------------------------------------------------------
+-- extracting bound variales from a input expression
+---- returns Set of lambda variables
 boundVars :: Expression -> Set LambdaVar
 boundVars ex = difference (vars ex) (freeVars ex)
 
-freshTermVar :: Expression -> LambdaVar
-freshTermVar = head . toList . freshVars 1 . vars
-
--- returns n distinct fresh variables which do not occour in given set. Note
--- that this function works on an arbitrary variable set.
-freshVars :: Int -> Set LambdaVar -> Set LambdaVar
-freshVars n = fromList . getFreshN' n . toList where
-
-  getFreshN' :: Int -> [LambdaVar] -> [LambdaVar]
-  getFreshN' n []             = take n $ zipWith LambdaVar ['x'..] [0,1..]
-  getFreshN' n (v@(LambdaVar c _):vs) =
-    let m = maximum $ 
-            List.map index $ 
-            List.filter ((==c) . name) 
-            (v:vs)
-    in take n $ zipWith LambdaVar [c,c..] [1+m,2+m..]
--------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------
--- |returns a functions, which substitutes all free occourences of @x@ by @n@ 
+--------------------------------------------------------------------------------
+-- returns a functions, which substitutes all free* occurences of x by n
+---- if expression is a variable: sub if names match, else return same
+---- if expression is an application: sub both applicants
+---- if expression is an abstraction:
+------ if vars are the same, leave unchanged
+------ if x is NOT in free vars in the body, there is no x to be substituted
+------ if x is in free vars in the body AND abstraction var is not in free vars of n, substitute in the body
+------ else, we need a fresh var because abstraction variable y is in free vars of term to be substituted. fresh var is y'
 sub :: LambdaVar -> Expression -> Expression -> Expression
 sub x n (Variable y) | x == y = n 
-                 | x /= y = Variable y  
+                     | x /= y = Variable y  
 sub x n (Application p q) = Application (sub x n p) (sub x n q)
-sub x n (Abstraction y p)
-  | x == y                                               = Abstraction x p 
+sub x n (Abstraction y@(LambdaVar name num) p)
+  | x == y                                               = Abstraction y p 
   | not $ member x (freeVars p)                          = Abstraction y p
   | member x (freeVars p) && not (member y (freeVars n)) = Abstraction y (sub x n p)
   | member x (freeVars p) && member y (freeVars n)       = 
-     let z = freshTermVar $ Application n p 
-     in Abstraction z $ sub x n $ sub y (Variable z) p
--------------------------------------------------------------------------------------
+     let new = LambdaVar name (num+1) 
+     in Abstraction new $ sub x n $ sub y (Variable new) p
 
-
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- ALPHA equivalence
+--------------------------------------------------------------------------------
+-- returns whether 2 lambda expressions are alpha equivalent 
+---- variables derive Eq
+---- applications are alpha equivalent if their corresponding parts are
+---- we substitute bounding var of one abstraction into body of another and compare bodies
 alphaEquiv :: Expression -> Expression -> Bool
 alphaEquiv (Variable x) (Variable y)   = x == y
 alphaEquiv (Application a b) (Application x y) = alphaEquiv a x && alphaEquiv b y
 alphaEquiv (Abstraction x f) (Abstraction y g) =
   alphaEquiv f $ sub y (Variable x) g
 alphaEquiv _ _ = False
--------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- BETA reduction
--- |returns all beta redexes of given lambda term
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- finds all beta redexes of given lambda term
+----- variable has no redexes
+----- application of abstraction to expression is itself a redex. concatenate it with any inner redexes
+----- redexes of (other type) application are just concatenated redexes of applicants
+----- redexes of abstraction are redexes of its body
 betaRedexes :: Expression -> [Expression] 
 betaRedexes (Variable _)                = [] 
 betaRedexes e@(Application (Abstraction _ e1) e2) = e : (betaRedexes e1 ++ betaRedexes e2)
-betaRedexes (Application e1 e2)              = betaRedexes e1 ++ betaRedexes e2
-betaRedexes (Abstraction _ f)             = betaRedexes f
+betaRedexes (Application e1 e2)  = betaRedexes e1 ++ betaRedexes e2
+betaRedexes (Abstraction _ f)    = betaRedexes f
 
--- |determines whether given lambda term contains at least one beta redex
+--------------------------------------------------------------------------------
+-- determines whether given lambda expression contains at least one beta redex
 hasBetaRedex :: Expression -> Bool
 hasBetaRedex = not . List.null . betaRedexes
 
--- |one step beta reduction
+--------------------------------------------------------------------------------
+-- performs one step beta reduction
+---- application of abstraction to an expression beta reduces by definition substituting expression for bounding var in the body of abstraction
+---- (other type) application reduces its applicants (first left one to beta nf)
+---- reducing abstraction is reducing its body
+---- variable doesnt reduce
 betaReduction :: Expression -> Expression
-betaReduction (Application (Abstraction v e) a) = sub v a e
+betaReduction (Application (Abstraction v e) a) = sub v a e --sub v a e
 betaReduction (Application e1 e2)          
-  | e1 == betaReduction e1 = Application e1 (betaReduction e2)
+  | e1 == betaReduction e1  = Application e1 (betaReduction e2)
   | otherwise               = Application (betaReduction e1) e2
 betaReduction (Abstraction v e)         = Abstraction v $ betaReduction e
 betaReduction (Variable v)             = Variable v
 
--- |computes the beta normal form of a lambda term
+--------------------------------------------------------------------------------
+-- computes the beta normal form of a lambda term
+---- do one step beta reduction if there are any redexes left
 betaNF :: Expression -> Expression
 betaNF ex
   | hasBetaRedex ex = betaNF $ betaReduction ex
-  | otherwise      = ex
--------------------------------------------------------------------------------------
+  | otherwise       = ex
 
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
 -- ** tree based visualization of all possible beta reductions
 rList :: (Expression -> Expression) -> Expression -> Set Expression
 rList f (Variable v)  = singleton $ f $ Variable v
@@ -119,5 +144,4 @@ rTree x = Node x (List.map rTree . toList . delete x $ rList id x)
 -- |draws the tree with all possible reductions
 drawPossibleReductions :: Expression -> InputT IO ()
 drawPossibleReductions = outputStrLn . drawTree . fmap show . rTree
--------------------------------------------------------------------------------------
 
