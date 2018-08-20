@@ -53,7 +53,7 @@ findChurch exp num = do
     case (alphaEquiv exp (fromNumber num (Variable (LambdaVar 'x' 0)))) of
         True -> show num
         False -> do
-            case num>999 of
+            case num==99 of
                 True -> "none"
                 False -> findChurch exp (num+1)
 
@@ -62,7 +62,7 @@ findBinary exp num = do
     case (alphaEquiv exp (betaNF (fromBinary num))) of
         True -> show num
         False -> do
-            case num>8190 of
+            case num==2047 of
                 True -> "none"
                 False -> findBinary exp (num+1)
 
