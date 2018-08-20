@@ -2,6 +2,7 @@ module Helper where
 
 import Syntax
 import Reducer
+import Parser
 
 import Control.Monad.State
 import System.IO (hFlush, stdout)
@@ -9,34 +10,24 @@ import Debug.Trace
 import System.Console.Haskeline
 
 
-id' = Abstraction (LambdaVar 'x' 0) (Variable (LambdaVar 'x' 0))
-
 -------------------------------------------------------------------------------------
 showGlobal :: (String, Expression) -> InputT IO ()
 showGlobal (n, e) = outputStrLn ("--- " ++ show n ++ " = " ++ show e)
 
 convertToName :: Environment -> Expression -> String
-convertToName [] abs@(Abstraction v e) = do
-    let numeral = findNumeral (Application abs id') 0
-    case numeral of
-        "none" -> "none"
-        otherwise -> numeral
-convertToName [] exp = "none"
+convertToName [] exp = findNumeral exp
 convertToName ((v,e):rest) ex 
     | alphaEquiv e ex = v
     | otherwise       = convertToName rest ex
 
 convertToNames :: Environment -> Expression -> String
--- convertToNames env (EnvironmentVar v) = show v IMPOSSIBLE
 convertToNames env (Variable v) = show v
 convertToNames env app@(Application m n) = do
-    --let app1 = trace ("app " ++ show m ++ " : " ++ show n ++ " :- " ++ (convertToName env app)) (convertToName env app)
     let app1 = convertToName env app
     case app1 of
         "none" -> "(" ++ (convertToNames env m) ++ " " ++ (convertToNames env n) ++ ")"
         otherwise -> app1
 convertToNames env abs@(Abstraction v e) = do
-    --let abs1 = trace ("abs " ++ show v ++ " : " ++ show e ++ " :- " ++ (convertToName env abs)) (convertToName env abs)
     let abs1 = convertToName env abs
     case abs1 of
         "none" -> "(λ" ++ (show v) ++ ". " ++ (convertToNames env e) ++ ")"
@@ -56,27 +47,36 @@ reviewVariable ((v,e):rest) var
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
-
--- NO, NO, NO
--- apply numeral to successor (+1) and 0, see what you get
-findNumeral :: Expression -> Int -> String
-findNumeral app@(Application e1 id') num = do
-    case (alphaEquiv e1 id') of
-        True -> "none"
+-- construct Expression for numeral from num and check alpha equivalence
+findChurch :: Expression -> Int -> String
+findChurch exp num = do
+    case (alphaEquiv exp (fromNumber num (Variable (LambdaVar 'x' 0)))) of
+        True -> show num
         False -> do
-            case num>=200 of
+            case num>999 of
                 True -> "none"
-                False -> findNumeral (betaReduction app) (num+1)
-findNumeral exp num = do
-    case (alphaEquiv exp id') of
-        True -> show (num-1)
+                False -> findChurch exp (num+1)
+
+findBinary :: Expression -> Int -> String
+findBinary exp num = do
+    case (alphaEquiv exp (betaNF (fromBinary num))) of
+        True -> show num
         False -> do
-            case (hasBetaRedex exp) of
-                True -> do
-                    case num>=200 of
-                        True -> "none"
-                        False -> findNumeral (betaReduction exp) (num+1)
-                False -> "none" 
+            case num>8190 of
+                True -> "none"
+                False -> findBinary exp (num+1)
+
+findNumeral :: Expression -> String
+findNumeral exp = do
+    let numeral = findChurch exp 0 
+    case numeral=="none" of
+        True -> do
+            let numeral = findBinary exp 0
+            case numeral=="none" of
+                True -> "none"
+                False -> "b" ++ numeral 
+        False -> numeral
+
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
