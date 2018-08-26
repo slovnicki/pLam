@@ -112,7 +112,7 @@ main =
 \        | |\n\
 \    ____| |   ___  __  __\n\
 \    | _ \\ |__| _ \\|  \\/  |\n\
-\    |  _/____|____\\_\\__/_| \x1b[32mv0.1.0\n\
+\    |  _/____|____\\_\\__/_| \x1b[32mv1.0.0\n\
 \    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
 \   \x1b[1;36m=================================\n") (runInputT defaultSettings (repl [])) where
         repl env = do
