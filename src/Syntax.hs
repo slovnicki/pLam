@@ -25,9 +25,15 @@ data Expression = Variable LambdaVar
                 | EnvironmentVar String
                 deriving (Ord,Eq)
 
+uncurryShow :: Expression -> String
+uncurryShow (Abstraction v1 (Abstraction v2 e)) = show v1 ++ show v2 ++ uncurryShow e
+uncurryShow (Abstraction v e) = show v ++ "." ++ show e
+uncurryShow (Variable v) = ". " ++ show v
+uncurryShow (Application e1 e2) = ". " ++ show e1 ++ " " ++ show e2
+
 instance Show Expression where
     show (Variable v)        = show v
-    show (Abstraction n t)   = "\x1b[32m(λ\x1b[0m" ++ show n ++ "\x1b[32m.\x1b[0m" ++ show t ++ "\x1b[32m)\x1b[0m"
+    show abs@(Abstraction v e)   = "\x1b[32m(λ\x1b[0m" ++ uncurryShow abs ++ "\x1b[32m)\x1b[0m"
     show (Application t1 t2) = "\x1b[33m[\x1b[0m" ++ show t1 ++ " " ++ show t2 ++ "\x1b[33m]\x1b[0m"
     show (EnvironmentVar ev) = ev
 -------------------------------------------------------------------------------------

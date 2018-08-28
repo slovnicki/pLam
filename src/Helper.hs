@@ -85,9 +85,9 @@ showResult env exp num = do
     case (hasBetaRedex exp2) of
         True -> showResult env exp2 (num+1)
         False -> do
-            outputStrLn ("> reductions count : " ++ show num)
-            outputStrLn ("> β normal form    : " ++ show exp2)
-            outputStrLn ("> α-equivalent     : " ++ convertToNames env exp2)
+            outputStrLn ("> reductions count              : " ++ show num)
+            outputStrLn ("> uncurried β normal form       : " ++ show exp2)
+            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp2)
     
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
@@ -97,9 +97,9 @@ manualReduce env exp num = do
     line <- getInputLine "Continue? [Y/n]"
     case line of
         Just "n" -> do
-            outputStrLn ("> reductions count : " ++ show num)
-            outputStrLn ("> β normal form    : " ++ show exp)
-            outputStrLn ("> α-equivalent     : " ++ convertToNames env exp)
+            outputStrLn ("> reductions count              : " ++ show num)
+            outputStrLn ("> uncurried β normal form       : " ++ show exp)
+            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp)
         otherwise -> do
             let e2 = betaReduction exp
             case (hasBetaRedex exp) of
