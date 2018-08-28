@@ -47,10 +47,13 @@ reviewVariable ((v,e):rest) var
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
--- construct Expression for numeral from num and check alpha equivalence
+-- construct Expression for numeral from num and check equality
+---- before was checking alpha equivalence, but we restrict it now
+---- numerals will always be with same variables
+---- reduces execution time, esspecially for Churchs
 findChurch :: Expression -> Int -> String
 findChurch exp num = do
-    case (alphaEquiv exp (fromNumber num (Variable (LambdaVar 'x' 0)))) of
+    case (exp == (fromNumber num (Variable (LambdaVar 'x' 0)))) of
         True -> show num
         False -> do
             case num==99 of
@@ -59,23 +62,19 @@ findChurch exp num = do
 
 findBinary :: Expression -> Int -> String
 findBinary exp num = do
-    case (alphaEquiv exp (betaNF (fromBinary num))) of
-        True -> show num
+    case (exp == (betaNF (fromBinary num))) of
+        True -> "b" ++ (show num)
         False -> do
             case num==2047 of
                 True -> "none"
                 False -> findBinary exp (num+1)
 
-findNumeral :: Expression -> String
-findNumeral exp = do
-    let numeral = findChurch exp 0 
-    case numeral=="none" of
-        True -> do
-            let numeral = findBinary exp 0
-            case numeral=="none" of
-                True -> "none"
-                False -> "b" ++ numeral 
-        False -> numeral
+findNumeral :: Expression -> String 
+findNumeral abs@(Abstraction (LambdaVar v n) e)
+    | v == 'f'  = findChurch abs 0
+    | v == 'p'  = findBinary abs 0
+    | otherwise = "none"
+findNumeral exp = "none"
 
 -------------------------------------------------------------------------------------
 
