@@ -68,10 +68,10 @@ subBe = \x y. subB0e x y F
 -- variant substraction
 forkS = \x y c. (and (isEnd x) (isEnd y)) (c (pair numZ end) end) ((isEnd x) (pair numZ end) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c)))))
 
--- E = c (pair numZ end) end
--- A = pair numZ end
+-- E1 = end
+-- E2 = end
 -- B = pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))
--- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
+-- D = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
 
 -- whether a binary numeral has numZ bit
 hasZ = Y (\f. \x. (isEnd x) F ((isNumZ (fst x)) T (f (snd x))))
