@@ -59,27 +59,23 @@ pair = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Abstraction
 end = Abstraction (LambdaVar 'e' 0) true
 whichBit :: Int -> Expression
 whichBit b
-    | b == 0    = false
-    | otherwise = true
+    | b == 0  = false
+    | b == 1  = true
 ----------------
 fromBinary :: Int -> Expression
 fromBinary 0 = end
-fromBinary n = Application (Application (pair) (whichBit (mod n 2))) (fromBinary (quot n 2))  
+fromBinary n = Application (Application pair (whichBit (mod n 2))) (fromBinary (quot n 2))
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
-parseChurch :: Parser Expression
-parseChurch = do
+parseNumeral :: Parser Expression
+parseNumeral = do
     strNum <- many1 digit
     let intNum = read strNum :: Int
-    return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
-
-parseBinary :: Parser Expression
-parseBinary = do
-    reservedOp ":b"
-    strNum <- many1 digit
-    let intNum = read strNum :: Int
-    return (fromBinary intNum)
+    maybeB <- optionMaybe (char 'b') 
+    case maybeB == (Just 'b') of
+        True  -> return (fromBinary intNum)
+        False -> return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
 
 parseVariable :: Parser Expression
 parseVariable = do
@@ -106,8 +102,7 @@ parseApplication = do
   return $ foldl1 Application es
 
 parseSingleton :: Parser Expression
-parseSingleton =  parseChurch
-              <|> parseBinary
+parseSingleton =  parseNumeral
               <|> parseVariable
               <|> parseAbstraction
               <|> parens parseApplication

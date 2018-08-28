@@ -63,7 +63,7 @@ findChurch exp num = do
 findBinary :: Expression -> Int -> String
 findBinary exp num = do
     case (exp == (betaNF (fromBinary num))) of
-        True -> "b" ++ (show num)
+        True -> (show num) ++ "b"
         False -> do
             case num==2047 of
                 True -> "none"
