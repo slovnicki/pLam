@@ -62,7 +62,7 @@ findChurch exp num = do
 
 findBinary :: Expression -> Int -> String
 findBinary exp num = do
-    case (exp == (betaNF (fromBinary num))) of
+    case exp == fst ((betaNF 0 (fromBinary num))) of
         True -> (show num) ++ "b"
         False -> do
             case num==2047 of
@@ -81,15 +81,13 @@ findNumeral exp = "none"
 -------------------------------------------------------------------------------------
 showResult :: Environment -> Expression -> Int -> InputT IO ()
 showResult env exp num = do
-    let exp2 = betaReduction exp
-    case (hasBetaRedex exp2) of
-        True -> showResult env exp2 (num+1)
-        False -> do
-            outputStrLn ("> reductions count              : " ++ show num)
-            outputStrLn ("> uncurried β normal form       : " ++ show exp2)
-            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp2)
+    let expnf = betaNF 0 exp
+    outputStrLn ("> reductions count              : " ++ show (snd expnf))
+    outputStrLn ("> uncurried β normal form       : " ++ show (fst expnf))
+    outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env (fst expnf))
     
 
+{-
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
 manualReduce env exp num = do 
     outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
@@ -124,4 +122,5 @@ autoReduce env exp num = do
         False -> do
             outputStrLn ("--- no beta redexes!") 
             showResult env exp num
+-}
 -------------------------------------------------------------------------------------

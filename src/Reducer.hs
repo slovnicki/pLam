@@ -96,26 +96,34 @@ hasBetaRedex :: Expression -> Bool
 hasBetaRedex = not . List.null . betaRedexes
 
 --------------------------------------------------------------------------------
--- performs one step beta reduction
+-- performs one step beta reduction and count steps
 ---- application of abstraction to an expression beta reduces by definition substituting expression for bounding var in the body of abstraction
 ---- (other type) application reduces its applicants (first left one to beta nf)
 ---- reducing abstraction is reducing its body
 ---- variable doesnt reduce
-betaReduction :: Expression -> Expression
-betaReduction (Application (Abstraction v e) a) = sub v a e --sub v a e
-betaReduction (Application e1 e2)          
-  | e1 == betaReduction e1  = Application e1 (betaReduction e2)
-  | otherwise               = Application (betaReduction e1) e2
-betaReduction (Abstraction v e)         = Abstraction v $ betaReduction e
-betaReduction (Variable v)             = Variable v
+betaReduction :: Int -> Expression -> (Expression, Int)
+betaReduction n (Application (Abstraction v e) a) = (sub v a e, n+1)
+betaReduction n (Application e1 e2)          
+  | hasBetaRedex e1  = do
+      let e1b = betaReduction n e1
+      (Application (fst e1b) e2, snd e1b)
+  | otherwise  = do
+      let e2b = betaReduction n e2 
+      (Application e1 (fst e2b), snd e2b)
+betaReduction n (Abstraction v e) = do
+  let eb = betaReduction n e
+  (Abstraction v (fst eb), snd eb)
+betaReduction n (Variable v) = (Variable v, n)
 
 --------------------------------------------------------------------------------
--- computes the beta normal form of a lambda term
+-- computes the beta normal form of a lambda term and count steps
 ---- do one step beta reduction if there are any redexes left
-betaNF :: Expression -> Expression
-betaNF ex
-  | hasBetaRedex ex = betaNF $ betaReduction ex
-  | otherwise       = ex
+betaNF :: Int -> Expression -> (Expression, Int)
+betaNF n ex
+  | hasBetaRedex ex = do
+      let exb = betaReduction n ex
+      betaNF (snd exb) (fst exb)
+  | otherwise       = (ex, n)
 
 --------------------------------------------------------------------------------
 
@@ -131,6 +139,7 @@ betaNF ex
 
 --------------------------------------------------------------------------------
 -- ** tree based visualization of all possible beta reductions
+{-
 rList :: (Expression -> Expression) -> Expression -> Set Expression
 rList f (Variable v)  = singleton $ f $ Variable v
 rList f p@(Application m n) = insert (f $ betaReduction p) $ 
@@ -144,4 +153,5 @@ rTree x = Node x (List.map rTree . toList . delete x $ rList id x)
 -- |draws the tree with all possible reductions
 drawPossibleReductions :: Expression -> InputT IO ()
 drawPossibleReductions = outputStrLn . drawTree . fmap show . rTree
+-}
 
