@@ -53,7 +53,7 @@ reviewVariable ((v,e):rest) var
 ---- reduces execution time, esspecially for Churchs
 findChurch :: Expression -> Int -> String
 findChurch exp num = do
-    case (exp == (fromNumber num (Variable (LambdaVar 'x' 0)))) of
+    case (exp == (createChurch num (Variable (LambdaVar 'x' 0)))) of
         True -> show num
         False -> do
             case num==99 of
@@ -62,7 +62,7 @@ findChurch exp num = do
 
 findBinary :: Expression -> Int -> String
 findBinary exp num = do
-    case exp == fst ((betaNF 0 (fromBinary num))) of
+    case exp == fst ((betaNF 0 (createBinary num))) of
         True -> (show num) ++ "b"
         False -> do
             case num==2047 of
