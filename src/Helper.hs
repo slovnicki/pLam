@@ -76,22 +76,26 @@ findNumeral abs@(Abstraction (LambdaVar v n) e)
     | otherwise = "none"
 findNumeral exp = "none"
 
+
 -------------------------------------------------------------------------------------
+goodCounter :: Int -> Int -> Int
+goodCounter num rednum | rednum==0 = num
+                       | otherwise = rednum
 
 -------------------------------------------------------------------------------------
 showResult :: Environment -> Expression -> Int -> InputT IO ()
 showResult env exp num = do
     let expnf = betaNF 0 exp
-    outputStrLn ("> reductions count              : " ++ show (snd expnf))
+    let count = goodCounter num (snd expnf)
+    outputStrLn ("> reductions count              : " ++ show count)
     outputStrLn ("> uncurried β normal form       : " ++ show (fst expnf))
     outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env (fst expnf))
     
 
-{-
+
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
 manualReduce env exp num = do 
     outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
-    --outputStrLn ("---- (" ++ show num ++ ": " ++ show exp ++ ")")
     line <- getInputLine "Continue? [Y/n]"
     case line of
         Just "n" -> do
@@ -99,28 +103,24 @@ manualReduce env exp num = do
             outputStrLn ("> uncurried β normal form       : " ++ show exp)
             outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp)
         otherwise -> do
-            let e2 = betaReduction exp
             case (hasBetaRedex exp) of
-                True -> manualReduce env e2 (num+1)
+                True -> do
+                    let e2b = betaReduction num exp
+                    manualReduce env (fst e2b) (snd e2b)
                 False -> do
                     outputStrLn ("--- no beta redexes!")
-                    manualReduce env e2 (num+1)
+                    showResult env exp num
+
 
 autoReduce :: Environment -> Expression -> Int -> InputT IO ()
 autoReduce env exp num = do
     outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
-    --outputStrLn ("---- (" ++ show num ++ ": " ++ show exp ++ ")")
     case (hasBetaRedex exp) of
         True -> do
-            case num>1000 of
-                True  -> do 
-                    outputStrLn ("--- 1000 reductions limit!")
-                    showResult env exp num
-                False -> do
-                    let e2 = betaReduction exp
-                    autoReduce env e2 (num+1)
+            let e2b = betaReduction num exp
+            autoReduce env (fst e2b) (snd e2b)        
         False -> do
             outputStrLn ("--- no beta redexes!") 
             showResult env exp num
--}
+
 -------------------------------------------------------------------------------------

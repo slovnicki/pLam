@@ -73,11 +73,10 @@ execute line env =
                         Left err -> outputStrLn $ show err
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
-                            op <- getInputLine "- type reduction option (a-auto, m-manual, t-tree, [DEFAULT-fast]): "
+                            op <- getInputLine "- type reduction option (a-auto, m-manual, [DEFAULT-fast]): "
                             case op of
-                                Just "a" -> showResult env exp 0--autoReduce env exp 0
-                                --Just "m" -> manualReduce env exp 0
-                                --Just "t" -> drawPossibleReductions exp
+                                Just "a" -> autoReduce env exp 0
+                                Just "m" -> manualReduce env exp 0
                                 otherwise -> showResult env exp 0
                     return env
                 Import f -> do

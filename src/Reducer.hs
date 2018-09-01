@@ -125,33 +125,5 @@ betaNF n ex
       betaNF (snd exb) (fst exb)
   | otherwise       = (ex, n)
 
---------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------------------------------------
--- ** tree based visualization of all possible beta reductions
-{-
-rList :: (Expression -> Expression) -> Expression -> Set Expression
-rList f (Variable v)  = singleton $ f $ Variable v
-rList f p@(Application m n) = insert (f $ betaReduction p) $ 
-  rList (\x -> f $ Application x n) m  `union` rList (f . Application m) n 
-rList f (Abstraction v e) = rList (f . Abstraction v) e
-
--- |builds the tree of all possible reductions
-rTree :: Expression -> Tree Expression
-rTree x = Node x (List.map rTree . toList . delete x $ rList id x)
-
--- |draws the tree with all possible reductions
-drawPossibleReductions :: Expression -> InputT IO ()
-drawPossibleReductions = outputStrLn . drawTree . fmap show . rTree
--}
 
