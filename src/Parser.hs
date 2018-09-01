@@ -48,9 +48,9 @@ comment = many $ symbol <|> letter <|> digit
 filename :: Parser String
 filename = many1 $ letter <|> symbol <|> digit
 
-fromNumber :: Int -> Expression -> Expression
-fromNumber 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
-fromNumber n exp = fromNumber (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
+createChurch :: Int -> Expression -> Expression
+createChurch 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0) exp)
+createChurch n exp = createChurch (n-1) (Application (Variable (LambdaVar 'f' 0)) exp)
 
 -- HELP EXPRS --
 true = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Variable (LambdaVar 'x' 0)))
@@ -62,9 +62,13 @@ whichBit b
     | b == 0  = false
     | b == 1  = true
 ----------------
-fromBinary :: Int -> Expression
-fromBinary 0 = end
-fromBinary n = Application (Application pair (whichBit (mod n 2))) (fromBinary (quot n 2))
+createBinary' :: Int -> Expression
+createBinary' 0 = end
+createBinary' n = Application (Application pair (whichBit (mod n 2))) (createBinary' (quot n 2))
+----------------
+createBinary :: Int -> Expression
+createBinary 0 = Application (Application pair false) end
+createBinary n = createBinary' n
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -74,8 +78,8 @@ parseNumeral = do
     let intNum = read strNum :: Int
     maybeB <- optionMaybe (char 'b') 
     case maybeB == (Just 'b') of
-        True  -> return (fromBinary intNum)
-        False -> return (fromNumber intNum (Variable (LambdaVar 'x' 0)))
+        True  -> return (createBinary intNum)
+        False -> return (createChurch intNum (Variable (LambdaVar 'x' 0)))
 
 parseVariable :: Parser Expression
 parseVariable = do
