@@ -88,7 +88,7 @@ showResult env exp num = do
     let expnf = betaNF 0 exp
     let count = goodCounter num (snd expnf)
     outputStrLn ("> reductions count              : " ++ show count)
-    outputStrLn ("> uncurried β normal form       : " ++ show (fst expnf))
+    outputStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
     outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env (fst expnf))
     
 
@@ -100,7 +100,7 @@ manualReduce env exp num = do
     case line of
         Just "n" -> do
             outputStrLn ("> reductions count              : " ++ show num)
-            outputStrLn ("> uncurried β normal form       : " ++ show exp)
+            outputStrLn ("> uncurried β-normal form       : " ++ show exp)
             outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp)
         otherwise -> do
             case (hasBetaRedex exp) of
