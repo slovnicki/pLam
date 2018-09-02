@@ -23,3 +23,6 @@ exp = \m n. n m
 isZ = \n. n (\x. F) T
 leq = \m n. isZ (sub m n)
 eq = \m n. and (leq m n) (leq n m)
+
+----------------- OMEGA -------------------
+omega = (\x. x x) (\x. x x)
