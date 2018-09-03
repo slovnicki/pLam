@@ -54,9 +54,9 @@ addBe = \x y. addB0e x y F
 forkA = \x y c. (and (isEnd x) (isEnd y)) (c (pair T end) end) ((isEnd x) (pair (xor3 F (fst y) c) (f end (snd y) (carryA F (fst y) c))) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryA (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c)))))
 
 -- E = c (pair T end) end
--- M = pair (xor3 F (fst y) c) (f end (snd y) (carryA F (fst y) c))
--- N = pair (xor3 (fst x) F c) (f (snd x) end (carryA (fst x) F c))
--- L = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c))
+-- E1 = pair (xor3 F (fst y) c) (f end (snd y) (carryA F (fst y) c))
+-- E2 = pair (xor3 (fst x) F c) (f (snd x) end (carryA (fst x) F c))
+-- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryA (fst x) (fst y) c))
 
 addB0 = Y (\f. forkA)
 addB = \x y. addB0 x y F
@@ -74,10 +74,10 @@ subBe = \x y. subB0e x y F
 -- variant subtraction
 forkS = \x y c. (and (isEnd x) (isEnd y)) (c (pair numZ end) end) ((isEnd x) (pair numZ end) ((isEnd y) (pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))) (pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c)))))
 
--- E1 = end
--- E2 = end
--- B = pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))
--- D = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
+-- E = (c (pair numZ end) end)
+-- E1 = (pair numZ end)
+-- E2 = pair (xor3 (fst x) F c) (f (snd x) end (carryS (fst x) F c))
+-- C = pair (xor3 (fst x) (fst y) c) (f (snd x) (snd y) (carryS (fst x) (fst y) c))
 
 -- cut off trailing F bits
 cutoff = Y (\f. \x. (isZeroB (snd x)) (pair (fst x) end) (pair (fst x) (f (snd x))))
@@ -87,9 +87,9 @@ hasZ = Y (\f. \x. (isEnd x) F ((isNumZ (fst x)) T (f (snd x))))
 makeZ = \x. (hasZ x) 0b x
 
 subB0 = Y (\f. forkS)
-subB = \x y. subB0 x y F
-subBc = \x y. cutoff (subB x y)
-subBs = \x y. cutoff (makeZ (subB0 x y F))
+subBf = \x y. subB0 x y F
+subBc = \x y. cutoff (subBf x y)
+subBs = \x y. cutoff (makeZ (subBf x y))
 ----------------------------------------------
 
 ---------------------------
@@ -99,17 +99,17 @@ subBs = \x y. cutoff (makeZ (subB0 x y F))
 isZeroB = Y (\f. \x. (isEnd x) T ((fst x) F (f (snd x))))
 
 -- successor
-SB = \x. addB x :b1
+SB = \x. addB x 1b
 
 -- predecessor
-PB = \x. subB x :b1
+PB = \x. subBs x 1b
 ---------------------------------------------
 
 -- multiplication
 mulb = Y (\f. \x b. (isEnd x) end (b (pair (fst x) (f (snd x) b)) (pair F (f (snd x) b))))
 shiftr = \x. pair F x
 mulB0 = Y (\f. \x y s. (isEnd y) s (f x (snd y) (addB s (shiftr (mulb x (fst y))))))
-mulB = \x y. mulB0 x y :b0
+mulB = \x y. mulB0 x y 0b
 
 -- primitive recursion, version 0
 --PR0 = \G H. (Y (\f k. (isZeroB k) G (H k (f (PB k)))))
