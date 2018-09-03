@@ -91,7 +91,7 @@ execute line env =
                        otherwise -> outputStrLn ("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
                 Run f -> do
-                    content <- liftIO $ readFile f
+                    content <- liftIO $ readFile (f ++ ".plam")
                     let exprs = lines content
                     execAll exprs env
                 Print s -> do
