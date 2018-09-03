@@ -108,7 +108,7 @@ manualReduce env exp num = do
                     let e2b = betaReduction num exp
                     manualReduce env (fst e2b) (snd e2b)
                 False -> do
-                    outputStrLn ("--- no beta redexes!")
+                    outputStrLn ("--- no beta redexes.")
                     showResult env exp num
 
 
@@ -120,7 +120,7 @@ autoReduce env exp num = do
             let e2b = betaReduction num exp
             autoReduce env (fst e2b) (snd e2b)        
         False -> do
-            outputStrLn ("--- no beta redexes!") 
+            outputStrLn ("--- no beta redexes.") 
             showResult env exp num
 
 -------------------------------------------------------------------------------------
