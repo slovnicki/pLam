@@ -31,10 +31,10 @@ Y = \f. (\x. f(x x)) (\x. f(x x))
 Z = \x. 0
 S = \n f x. f (n f x)
 I11 = \x. x 
-I21 = \x y. x
+I12 = \x y. x
 I22 = \x y. y
-I31 = \x y z. x
-I32 = \x y z. y
+I13 = \x y z. x
+I23 = \x y z. y
 I33 = \x y z. z
 
 --==========================================--
@@ -54,8 +54,8 @@ PR1 = \g h. Y (\f x y. (isZ y) (g x) (h x (P y) (f x (P y))))
                 MINIMIZATION 
 --==========================================--
 MIN1x = \g. Y (\h x. (isZ (g x)) x (h (S x)))
-MIN1 = \g. MIN1x g 0
+MIN1 = \g. (Y (\h x. (isZ (g x)) x (h (S x)))) 0
 MIN2x = \g. Y (\h x y. (isZ (g x y)) y (h x (S y)))
-MIN2 = \g. \x. MIN2x g x 0
+MIN2 = \g. (Y (\h x y. (isZ (g x y)) y (h x (S y)))) 0
 
 
