@@ -1,5 +1,5 @@
 -------------------------------------
--- example 2.5.3; church comparison
+-- example 2.2.6; church comparison
 -------------------------------------
 
 T = \x y. x
