@@ -14,7 +14,7 @@ import Syntax
 languageDef =
     emptyDef { Token.commentLine     = "--"
              , Token.identStart      = letter
-             , Token.identLetter     = alphaNum
+             , Token.identLetter     = alphaNum <|> char '_'
              , Token.reservedNames   = [ ":import"
                                        , ":review"
                                        , ":run"
