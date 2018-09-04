@@ -2,10 +2,10 @@
 --           ARITHMETIC            --
 -------------------------------------
 
-succ = \n f x. f (n f x)
-pred = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
+Sc = \n f x. f (n f x)
+Pc = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
 add = \m n f x. (m f (n f x))
-sub = \m n. (n pred) m
+sub = \m n. (n Pc) m
 mul = \m n f. m (n f)
 exp = \m n. n m
 
@@ -14,6 +14,6 @@ F = \x y. y
 and = \x y. x y F
 
 --------------- PREDICATES ----------------
-isZero = \n. n (\x. F) T
-leq = \m n. isZero (sub m n)
+isZc = \n. n (\x. F) T
+leq = \m n. isZc (sub m n)
 eq = \m n. and (leq m n) (leq n m)
