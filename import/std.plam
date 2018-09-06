@@ -29,8 +29,8 @@ mul = \m n f. m (n f)
 exp = \m n. n m
 
 --------------- PREDICATES ----------------
-isZ = \n. n (\x. F) T
-leq = \m n. isZ (sub m n)
+isZc = \n. n (\x. F) T
+leq = \m n. isZc (sub m n)
 eq = \m n. and (leq m n) (leq n m)
 
 ----------------- OMEGA -------------------
