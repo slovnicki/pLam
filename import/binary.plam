@@ -5,7 +5,7 @@
 -- TODO wishes:
 ---- features   : negative numerals
 ---- operations : div, mod
----- fixes      : mul, mulb simplify, sub a b (a<b), sub L, carry
+---- fixes      : mul, mulb simplify
 
 
 ---------------- BOOLEANS -----------------
