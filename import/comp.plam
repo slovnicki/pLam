@@ -41,8 +41,10 @@ I33 = \x y z. z
                  COMPOSITION 
 --==========================================--
 C1 = \g h. \x. g (h x)
-C2 = \g h. \x y. g (h x y) 
-C3 = \g h. \x y z. g (h x y z) 
+C2 = \g h. \x y. g (h x y)
+C22 = \g h i. \x y. g (h x y) (i x y) 
+C3 = \g h. \x y z. g (h x y z)
+C23 = \g h i. \x y z. g (h x y z) (i x y z)
 
 --==========================================--
              PRIMITIVE RECURSION 
