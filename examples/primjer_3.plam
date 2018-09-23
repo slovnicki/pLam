@@ -1,0 +1,14 @@
+----------------------------
+-- primjeri (3)
+----------------------------
+
+:import comp
+:import std
+
+fact = PR0 1 (C22 mul (C2 S I12) I22)
+two = MIN1 (\x. mul (sub 2 x) (sub 3 x))
+
+add = PR1 I11 (C3 S I33)
+add3 = C23 add I13 (C23 add I23 I33)
+sub = PR1 I11 (C3 P I33)
+mul = PR1 Z (C23 add I13 I33)
