@@ -39,8 +39,8 @@ stack exec plam
 
 ## Examples:
 
-NOTE: Output might be slightly different due to constant fixes and changes.
-      Fully updated examples will be put each time they diverge too far from current.
+**NOTE:** Output might be slightly different due to constant fixes and changes. Fully updated examples will be put each time they diverge too far from current.  
+All the examples can be found in `examples/` directory.
 
 ### Fun with booleans
 ```
@@ -48,16 +48,16 @@ NOTE: Output might be slightly different due to constant fixes and changes.
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v0.1.0
+    |  _/____|____\_\__/_| v1.0.0
     |_| pure λ-calculus interpreter
    =================================
 
 pLam> :import booleans
 pLam> 
-pLam> and (not F) (or (xor F T) F)
------ reductions count : 14
------ β normal form    : λx.λy.x
------ α-equivalent     : T
+pLam> and (or F (not F)) (xor T F)
+> reductions count              : 18
+> uncurried β-normal form       : (λxy. x)
+> curried (partial) α-equivalent: T
 pLam>
 ```
 
@@ -67,16 +67,17 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v0.1.0
+    |  _/____|____\_\__/_| v1.0.0
     |_| pure λ-calculus interpreter
    =================================
 
 pLam> :import std
-pLam> sub (add 3 2) 1
------ reductions count : 24
------ β normal form    : λf.λx.(f (f (f (f x))))
------ α-equivalent     : 4
-pLam>
+pLam> 
+pLam> mul (add 2 (Sc 2)) (sub (exp 2 3) (Pc 8))
+> reductions count              : 762
+> uncurried β-normal form       : (λfx. f (f (f (f (f x)))))
+> curried (partial) α-equivalent: 5
+pLam> 
 ```
 
 ### Factorial
@@ -85,22 +86,22 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v0.1.0
+    |  _/____|____\_\__/_| v1.0.0
     |_| pure λ-calculus interpreter
    =================================
 
 pLam> :import std
 pLam> :import comp
-pLam> fact = PR0 1 mul
-pLam> fact 3
------ reductions count : 647
------ β normal form    : λf.λx.(f (f (f (f (f (f x))))))
------ α-equivalent     : 6
 pLam>
+pLam> fact = PR0 1 (C22 mul (C2 S I12) I22)
+pLam> fact 3
+> reductions count              : 898
+> uncurried β-normal form       : (λfx. f (f (f (f (f (f x))))))
+> curried (partial) α-equivalent: 6
+pLam> 
 ```
 
 ### Minimization
-Detailed description of what is going on is given in programs/min.plam as comments.
 #### interactive coding:
 ```
         _
@@ -114,16 +115,12 @@ Detailed description of what is going on is given in programs/min.plam as commen
 pLam> :import std
 pLam> :import comp
 pLam> 
-pLam> f = \x. sub 6 (mul 2 x)
-pLam> cond = \x y. sub (f x) y
-pLam> find = MIN cond
-pLam> x0 = find 0
+pLam> fun = \x. mul (sub 2 x) (sub 3 x)
+pLam> MIN1 fun
+> reductions count              : 114
+> uncurried β-normal form       : (λfx. f (f x))
+> curried (partial) α-equivalent: 2
 pLam> 
-pLam> x0
------ reductions count : 292
------ β normal form    : λf.λx.(f (f (f x)))
------ α-equivalent     : 3
-pLam>
 ```
 #### running the existing program:
 ```
@@ -131,15 +128,17 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v0.1.0
+    |  _/____|____\_\__/_| v1.0.0
     |_| pure λ-calculus interpreter
    =================================
 
-pLam> :run programs/min.plam
-zero of f(x) = 6-2x is...
------ reductions count : 292
------ β normal form    : λf.λx.(f (f (f x)))
------ α-equivalent     : 3
+pLam> :run examples/2.5.2
+=================================
+< zero
+=================================
+> reductions count              : 114
+> uncurried β-normal form       : (λfx. f (f x))
+> curried (partial) α-equivalent: 2
 pLam>
 ```
 
@@ -149,26 +148,28 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v0.1.0
+    |  _/____|____\_\__/_| v1.0.0
     |_| pure λ-calculus interpreter
    =================================
 
-pLam> -- first, let's try sub with Church numerals to see the reductions count
-pLam> :import std
-pLam> sub 255 4
------ reductions count : 2051
------ β normal form    : λf.λx.(f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f (f x)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
------ α-equivalent     : 251
-pLam> 
-pLam> -- now the binary version
-pLam> -- NOTE: operations on this representation of numerals have reduction complexity dependant just on the number of bits of larger operand
 pLam> :import binary
-pLam> bin4 = pair F (pair F (pair T end))
-pLam> bin255 = make8b T T T T T T T T
-pLam> subBv bin255 bin4
------ reductions count : 1950
------ β normal form    : λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.y) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λp.((p λx.λy.x) λe.λx.λy.x))))))))
------ α-equivalent     : λp.((p T) λp.((p T) λp.((p F) λp.((p T) λp.((p T) λp.((p T) λp.((p T) λp.((p T) end))))))))
+pLam>
+pLam> 0b
+> reductions count              : 2
+> uncurried β-normal form       : (λp.((p (λxy. y)) (λexy.x)))
+> curried (partial) α-equivalent: 0b
+pLam> 
+pLam> 2048b
+> reductions count              : 24
+> uncurried β-normal form       : (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. x)) (λexy.x)))))))))))))))))))))))))
+> curried (partial) α-equivalent: (λp. ((p F) 1024b))
+pLam>
+pLam>
+pLam> addB 7b (subBs 2b 3b)
+> reductions count              : 9458
+> uncurried β-normal form       : (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λexy.x)))))))
+> curried (partial) α-equivalent: 7b
+pLam>
 pLam> :quit
 Goodbye!
 ```
