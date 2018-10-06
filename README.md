@@ -22,11 +22,11 @@ On Windows, you can download 64-bit installer given at https://docs.haskellstack
 ## Build & Run
 1. clone project repository:
 ```
-git clone https://github.com/sandrolovnicki/lambda-calculus-interpreter.git
+git clone https://github.com/sandrolovnicki/pLam.git
 ```
 2. go to project directory:
 ```
-cd lambda-calculus-interpreter
+cd pLam
 ```
 3. setup stack on isolated location
 ```
