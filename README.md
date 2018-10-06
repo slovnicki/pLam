@@ -1,5 +1,9 @@
-# λ-calculus interpreter
-(on its way to become fun programming language)
+# pLam - a pure λ-calculus interpreter
+
+This programming language (pLam) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.  
+
+Inside `import/` directory, some useful λ-expressions are already implemented.  
+Inside `examples/` directory, there are many examples of λ-expressions demonstrating pLam's capabilities.
 
 ## Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
