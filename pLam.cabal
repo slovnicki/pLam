@@ -1,8 +1,8 @@
-name:                lambda-calculus-interpreter
+name:                pLam
 version:             1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/sandrolovnicki/lambda-calculus-interpreter#readme
+homepage:            https://github.com/sandrolovnicki/pLam#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Sandro Lovnički
@@ -28,7 +28,7 @@ executable plam
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
-                     , lambda-calculus-interpreter
+                     , pLam
                      , mtl
                      , containers
                      , haskeline
@@ -36,4 +36,4 @@ executable plam
 
 source-repository head
   type:     git
-  location: https://github.com/sandrolovnicki/lambda-calculus-interpreter
+  location: https://github.com/sandrolovnicki/pLam
