@@ -5,6 +5,11 @@
 
 path_to_project=$(pwd)
 echo "Your path to this project is $path_to_project"
+echo "... adding the path to import/ into app/Config.hs"
+echo "module Config where" > src/Config.hs
+echo "" >> src/Config.hs
+echo "importPath = \"$path_to_project/import/\"" >> src/Config.hs
+
 path_to_bin=$(find .stack-work/install -name plam)
 echo "Your path to plam binary is $path_to_bin"
 
