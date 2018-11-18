@@ -1,3 +1,4 @@
+import Config
 import Syntax
 import Parser
 import Evaluator
@@ -22,7 +23,7 @@ execAll (line:ls) env =
                 return env
             Right comm -> case comm of   
                 Import f -> do
-                    content <- liftIO $ readFile ("import/" ++ f ++ ".plam")
+                    content <- liftIO $ readFile (importPath ++ f ++ ".plam")
                     let exprs = lines content
                     env' <- execAll exprs env
                     execAll ls env'
@@ -80,7 +81,7 @@ execute line env =
                                 otherwise -> showResult env exp 0
                     return env
                 Import f -> do
-                    content <- liftIO $ readFile ("import/" ++ f ++ ".plam")
+                    content <- liftIO $ readFile (importPath ++ f ++ ".plam")
                     let exprs = lines content
                     execAll exprs env                  
                 Review r -> do
