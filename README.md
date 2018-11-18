@@ -20,11 +20,12 @@ wget -qO- https://get.haskellstack.org/ | sh
 On Windows, you can download 64-bit installer given at https://docs.haskellstack.org/en/stable/README/.
 
 ## Build & Run
-1. clone project repository:
+### First time setup
+1. clone project repository
 ```
 git clone https://github.com/sandrolovnicki/pLam.git
 ```
-2. go to project directory:
+2. go to project directory
 ```
 cd pLam
 ```
@@ -32,13 +33,25 @@ cd pLam
 ```
 stack setup
 ```
-4. use stack to build project:
+### Building
+4. use stack to build project
 ```
 stack build
 ```
-5. use stack to run project executable
+### Running (locally)
+5.a) use stack to run project executable from project's directory
 ```
 stack exec plam
+```
+### Running (globally)
+5.b) use `make_global.sh` script to create a global command 'plam' that can be used to start pLam from anywhere in your system. The script will also change your import path in src/Config.hs so you need to build the project again.
+```
+sudo ./make_global.sh
+stack build
+```
+Now, (and anytime in the future!), you can start pLam from anywhere in your system by just typing
+```
+plam
 ```
 
 ## Examples:
