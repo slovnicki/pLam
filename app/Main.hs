@@ -12,6 +12,7 @@ import System.Exit
 import System.Console.Haskeline
 
 
+version = "1.2.0"
 -------------------------------------------------------------------------------------
 
 execAll :: [String] -> Environment -> InputT IO Environment
@@ -112,7 +113,7 @@ main =
 \        | |\n\
 \    ____| |   ___  __  __\n\
 \    | _ \\ |__| _ \\|  \\/  |\n\
-\    |  _/____|____\\_\\__/_| \x1b[32mv1.1.0\n\
+\    |  _/____|____\\_\\__/_| \x1b[32mv"++version++"\n\
 \    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
 \   \x1b[1;36m=================================\n") (runInputT defaultSettings (repl [])) where
         repl env = do
