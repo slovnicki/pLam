@@ -78,6 +78,9 @@ pLam> and (or F (not F)) (xor T F)
 pLam>
 ```
 
+### Redex coloring
+![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/doc/redex_coloring.png "Redex Coloring")
+
 ### Fun with arithmetic
 ```
          _
