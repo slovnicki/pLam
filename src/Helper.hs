@@ -20,17 +20,30 @@ convertToName ((v,e):rest) ex
     | alphaEquiv e ex = v
     | otherwise       = convertToName rest ex
 
-convertToNames :: Environment -> Expression -> String
-convertToNames env (Variable v) = show v
-convertToNames env app@(Application m n) = do
+convertToNames :: Bool -> Bool -> Expression -> Environment -> Expression -> String
+convertToNames redexFound redexVarFind redexVar env (Variable v) = 
+    case redexVarFind of
+        True -> case ((Variable v) == redexVar) of
+            True -> "\x1b[0;31m" ++ (show v) ++ "\x1b[0;36m"
+            False -> show v
+        False -> show v
+convertToNames redexFound redexVarFind redexVar env redex@(Application (Abstraction v e) n) = 
+    case redexFound of
+        True -> do
+            let redex1 = convertToName env redex
+            case redex1 of
+                "none" -> "(" ++ (convertToNames True False redexVar env (Abstraction v e)) ++ " " ++ (convertToNames True False redexVar env n) ++ ")"
+                otherwise -> redex1
+        False -> "\x1b[36m(\x1b[1;36m(λ\x1b[1;31m" ++ (show v) ++ "\x1b[1;36m.\x1b[0;36m " ++ (convertToNames True True (Variable v) env e) ++ "\x1b[1;36m) \x1b[1;32m" ++ (convertToNames True False redexVar env n) ++ "\x1b[0;36m)\x1b[0m"
+convertToNames redexFound redexVarFind redexVar env app@(Application m n) = do
     let app1 = convertToName env app
     case app1 of
-        "none" -> "(" ++ (convertToNames env m) ++ " " ++ (convertToNames env n) ++ ")"
+        "none" -> "(" ++ (convertToNames redexFound redexVarFind redexVar env m) ++ " " ++ (convertToNames redexFound redexVarFind redexVar env n) ++ ")"
         otherwise -> app1
-convertToNames env abs@(Abstraction v e) = do
+convertToNames redexFound redexVarFind redexVar env abs@(Abstraction v e) = do
     let abs1 = convertToName env abs
     case abs1 of
-        "none" -> "(λ" ++ (show v) ++ ". " ++ (convertToNames env e) ++ ")"
+        "none" -> "(λ" ++ (show v) ++ ". " ++ (convertToNames redexFound redexVarFind redexVar env e) ++ ")"
         otherwise -> abs1
 
 isDefined :: Environment -> String -> Bool
@@ -89,19 +102,19 @@ showResult env exp num = do
     let count = goodCounter num (snd expnf)
     outputStrLn ("> reductions count              : " ++ show count)
     outputStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
-    outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env (fst expnf))
+    outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
     
 
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
 manualReduce env exp num = do 
-    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
+    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     line <- getInputLine "Continue? [Y/n]"
     case line of
         Just "n" -> do
             outputStrLn ("> reductions count              : " ++ show num)
             outputStrLn ("> uncurried β-normal form       : " ++ show exp)
-            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames env exp)
+            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
         otherwise -> do
             case (hasBetaRedex exp) of
                 True -> do
@@ -114,7 +127,7 @@ manualReduce env exp num = do
 
 autoReduce :: Environment -> Expression -> Int -> InputT IO ()
 autoReduce env exp num = do
-    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames env exp))
+    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     case (hasBetaRedex exp) of
         True -> do
             let e2b = betaReduction num exp
