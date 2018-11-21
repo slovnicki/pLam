@@ -33,8 +33,8 @@ uncurryShow (Application e1 e2) = ". " ++ show e1 ++ " " ++ show e2
 
 instance Show Expression where
     show (Variable v)        = show v
-    show abs@(Abstraction v e)   = "\x1b[32m(λ\x1b[0m" ++ uncurryShow abs ++ "\x1b[32m)\x1b[0m"
-    show (Application t1 t2) = "\x1b[33m(\x1b[0m" ++ show t1 ++ " " ++ show t2 ++ "\x1b[33m)\x1b[0m"
+    show abs@(Abstraction v e)   = "(λ" ++ uncurryShow abs ++ ")"
+    show (Application t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
     show (EnvironmentVar ev) = ev
 -------------------------------------------------------------------------------------
 
