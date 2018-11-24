@@ -1,9 +1,13 @@
-# pLam - a pure λ-calculus interpreter
+<p align="center">
+  <img width="371" height="146" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/heading.png">
+</p>
 
-This programming language (pLam) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.  
+This programming language (pLam - a **p**ure **Lam**bda calculus interpreter) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.  
 
 Inside `import/` directory, some useful λ-expressions are already implemented.  
 Inside `examples/` directory, there are many examples of λ-expressions demonstrating pLam's capabilities.
+
+---
 
 ## Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
@@ -43,7 +47,7 @@ stack build
 ```
 stack exec plam
 ```
-### Running (globally)
+### Running (globally (Unix systems))
 5.b) use `make_global.sh` script to create a global command 'plam' that can be used to start pLam from anywhere in your system. The script will also change your import path in src/Config.hs so you need to build the project again.
 ```
 sudo ./make_global.sh
@@ -79,7 +83,7 @@ pLam>
 ```
 
 ### Redex coloring
-![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/doc/redex_coloring.png "Redex Coloring")
+![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/redex_coloring.png "Redex Coloring")
 
 ### Fun with arithmetic
 ```
