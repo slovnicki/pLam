@@ -166,17 +166,24 @@ repl env = do
             env' <- execute line env
             repl env'
 
+decideRun :: [String] -> IO()
+decideRun args
+    | length args == 0 = do
+        putStrLn heading 
+        runInputT defaultSettings (repl [])
+    | (length args == 1) && (head args == ":nohead") = do
+        runInputT defaultSettings (repl [])
+    | (length args == 1) && (isplam (head args)) = do
+        content <- readFile (head args)
+        let exprs = lines content
+        execJustProg exprs []
+        putStrLn "\x1b[1;32mDone.\x1b[0m"
+    | otherwise = do
+        putStrLn "\x1b[31mignoring argument(s)...\x1b[0m"
+        putStrLn heading 
+        runInputT defaultSettings (repl [])
+                  
 main :: IO ()
 main = do
     args <- getArgs
-    case ((length args == 1) && (isplam (head args))) of
-        True -> do
-            content <- readFile (head args)
-            let exprs = lines content
-            execJustProg exprs []
-            putStrLn "\x1b[1;32mDone.\x1b[0m"
-        False -> do 
-            putStrLn "\x1b[31mignoring arguments...\x1b[0m"
-            putStrLn heading 
-            runInputT defaultSettings (repl [])
-        
+    decideRun args
