@@ -10,9 +10,18 @@ import System.IO (hFlush, stdout)
 import Debug.Trace
 import System.Exit
 import System.Console.Haskeline
+import System.Environment
 
 
 version = "1.2.0"
+heading = "\x1b[1;36m\
+\         _\n\
+\        | |\n\
+\    ____| |   ___  __  __\n\
+\    | _ \\ |__| _ \\|  \\/  |\n\
+\    |  _/____|____\\_\\__/_| \x1b[32mv"++version++"\n\
+\    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
+\   \x1b[1;36m=================================\n"
 -------------------------------------------------------------------------------------
 
 execAll :: [String] -> Environment -> InputT IO Environment
@@ -101,28 +110,73 @@ execute line env =
                     outputStrLn ("(NOTE: it makes more sense to use a comment line (starts with double '-' than :print command when you are in interactive mode)")
                     return env
                 Comment c -> return env
-                    
 
+execJustProg :: [String] -> Environment -> IO Environment
+execJustProg [] env = return env
+execJustProg (line:ls) env =
+    case readLine line of
+            Left (SyntaxError err) -> do
+                putStrLn (show err) 
+                return env
+            Right comm -> case comm of   
+                Import f -> do
+                    content <- liftIO $ readFile (importPath ++ f ++ ".plam")
+                    let exprs = lines content
+                    env' <- execJustProg exprs env
+                    execJustProg ls env'
+                Define v e -> do
+                    let (res, env') = (evalDefine v e) `runState` env
+                    case res of
+                        Left err -> do
+                            putStrLn (show err)
+                            execJustProg ls env'
+                        Right f  -> execJustProg ls env'
+                Show e -> do
+                    let (res, env') = (evalExp e) `runState` env
+                    case res of
+                        Left err -> do
+                            putStrLn (show err)
+                            return env
+                        Right exp -> do
+                            showProgResult env exp 0
+                            execJustProg ls env'
+                Print s -> do
+                    putStrLn s
+                    execJustProg ls env
+                otherwise -> execJustProg ls env
+
+-------------------------------------------------------------------------------------
+isplam :: String -> Bool
+isplam (c:cs)
+    | (length cs == 5) && (cs == ".plam") = True
+    | length cs < 5 = False
+    | otherwise = isplam cs
+       
 -------------------------------------------------------------------------------------
                    -- MAIN with Read-Evaluate-Print Loop --
 -------------------------------------------------------------------------------------
+repl env = do
+    mline <- getInputLine "\x1b[1;36mpLam>\x1b[0m "
+    case mline of
+        Nothing -> return ()
+        Just ":quit" -> do
+            outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
+            return ()
+        Just line -> do
+            env' <- execute line env
+            repl env'
+
 main :: IO ()
-main = 
-    trace ("\x1b[1;36m\
-\         _\n\
-\        | |\n\
-\    ____| |   ___  __  __\n\
-\    | _ \\ |__| _ \\|  \\/  |\n\
-\    |  _/____|____\\_\\__/_| \x1b[32mv"++version++"\n\
-\    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
-\   \x1b[1;36m=================================\n") (runInputT defaultSettings (repl [])) where
-        repl env = do
-            mline <- getInputLine "\x1b[1;36mpLam>\x1b[0m "
-            case mline of
-                Nothing -> return ()
-                Just ":quit" -> do
-                    outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
-                    return ()
-                Just line -> do
-                    env' <- execute line env
-                    repl env'
+main = do
+    args <- getArgs
+    case ((length args == 1) && (isplam (head args))) of
+        True -> do
+            content <- readFile (head args)
+            let exprs = lines content
+            execJustProg exprs []
+            putStrLn "\x1b[1;32mDone.\x1b[0m"
+        False -> do 
+            putStrLn "\x1b[31mignoring arguments...\x1b[0m"
+            putStrLn heading 
+            runInputT defaultSettings (repl [])
+        

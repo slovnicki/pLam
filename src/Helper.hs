@@ -103,6 +103,14 @@ showResult env exp num = do
     outputStrLn ("> reductions count              : " ++ show count)
     outputStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
     outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
+
+showProgResult :: Environment -> Expression -> Int -> IO ()
+showProgResult env exp num = do
+    let expnf = betaNF 0 exp
+    let count = goodCounter num (snd expnf)
+    putStrLn ("> reductions count              : " ++ show count)
+    putStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
+    putStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
     
 
 
