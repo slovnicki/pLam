@@ -69,7 +69,7 @@ All the examples can be found in `examples/` directory.
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
@@ -82,7 +82,7 @@ pLam> and (or F (not F)) (xor T F)
 pLam>
 ```
 
-### Redex coloring
+#### Redex coloring
 ![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/redex_coloring.png "Redex Coloring")
 
 ### Fun with arithmetic
@@ -91,7 +91,7 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
@@ -110,7 +110,7 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
@@ -132,7 +132,7 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
@@ -152,7 +152,7 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
@@ -165,6 +165,17 @@ pLam> :run examples/2.5.2
 > curried (partial) α-equivalent: 2
 pLam>
 ```
+#### running the existing program (without entering pLam's shell):
+```
+plam ~/Projects/pLam/examples/2.5.2.plam
+=================================
+< zero
+=================================
+> reductions count              : 114
+> uncurried β-normal form       : (λfx. f (f x))
+> curried (partial) α-equivalent: 2
+Done.
+```
 
 ### Binary numerals
 ```
@@ -172,7 +183,7 @@ pLam>
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.2.0
+    |  _/____|____\_\__/_| v1.3.0
     |_| pure λ-calculus interpreter
    =================================
 
