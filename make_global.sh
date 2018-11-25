@@ -17,7 +17,7 @@ plam_path="$path_to_project/$path_to_bin"
 
 echo "... creating a script 'plam' in /usr/local/bin"
 echo "#!/bin/bash" > /usr/local/bin/plam
-echo $plam_path >> /usr/local/bin/plam
+echo "$plam_path \$@" >> /usr/local/bin/plam
 
 echo "... making it executable"
 chmod +x /usr/local/bin/plam
