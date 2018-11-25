@@ -69,7 +69,7 @@ All the examples can be found in `examples/` directory.
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
+    |  _/____|____\_\__/_| v1.3.1
     |_| pure λ-calculus interpreter
    =================================
 
@@ -87,14 +87,6 @@ pLam>
 
 ### Fun with arithmetic
 ```
-         _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :import std
 pLam> 
 pLam> mul (add 2 (Sc 2)) (sub (exp 2 3) (Pc 8))
@@ -106,14 +98,6 @@ pLam>
 
 ### Factorial
 ```
-         _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :import std
 pLam> :import comp
 pLam>
@@ -128,14 +112,6 @@ pLam>
 ### Minimization
 #### interactive coding:
 ```
-        _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :import std
 pLam> :import comp
 pLam> 
@@ -148,14 +124,6 @@ pLam>
 ```
 #### running the existing program:
 ```
-         _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :run examples/2.5.2
 =================================
 < zero
@@ -183,7 +151,7 @@ Done.
         | |
     ____| |   ___  __  __
     | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.0
+    |  _/____|____\_\__/_| v1.3.1
     |_| pure λ-calculus interpreter
    =================================
 

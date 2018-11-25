@@ -13,7 +13,7 @@ import System.Console.Haskeline
 import System.Environment
 
 
-version = "1.3.0"
+version = "1.3.1"
 heading = "\x1b[1;36m\
 \         _\n\
 \        | |\n\
