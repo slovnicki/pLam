@@ -12,7 +12,6 @@ Inside `examples/` directory, there are many examples of λ-expressions demonstr
 ## Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
 
-## Install
 On most Unix systems, you can get stack by typing:
 ```
 curl -sSL https://get.haskellstack.org/ | sh
@@ -58,7 +57,7 @@ Now, (and anytime in the future!), you can start pLam from anywhere in your syst
 plam
 ```
 
-## Examples:
+## Examples
 
 **NOTE:** Output might be slightly different due to constant fixes and changes. Fully updated examples will be put each time they diverge too far from current.  
 All the examples can be found in `examples/` directory.
