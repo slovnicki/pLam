@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="328" height="143" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/heading_v1.3.0.png">
+  <img width="907" height="475" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
 </p>
 
 This programming language (pLam - a **p**ure **Lam**bda calculus interpreter) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.  
