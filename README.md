@@ -2,10 +2,12 @@
   <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
 </p>
 
-This programming language (pLam - a **p**ure **Lam**bda calculus interpreter) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.  
+This programming language (pLam - a **p**ure **Lam**bda calculus interpreter) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.
 
 Inside `import/` directory, some useful λ-expressions are already implemented.  
 Inside `examples/` directory, there are many examples of λ-expressions demonstrating pLam's capabilities.
+
+_**Coming soon:** Wiki pages on λ-calculus and computability; detailed description of pLam's syntax and semantics, existent libraries and capabilities with examples_
 
 ---
 
