@@ -177,3 +177,9 @@ pLam>
 pLam> :quit
 Goodbye!
 ```
+
+---
+
+**Disclaimer for Haskell experts**  
+I am not a Haskell expert. In fact, this is my first and only Haskell project. It is inevitable that existing code could be written better and I wish to do it in the upcoming future.  
+The goal of the project was to create an environment for easy building of new expressions from previously defined ones, so that one could explore λ-calculus. It was a helper tool so I could define and test a new numeral system in λ-calculus, for my master thesis. Now, when this all went well, the time is coming for me to get back to Haskell code.
