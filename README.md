@@ -2,16 +2,14 @@
   <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
 </p>
 
-This programming language (pLam - a **p**ure **Lam**bda calculus interpreter) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with .plam extension and run anytime.
+This programming language (pLam - **p**ure **Lam**bda calculus) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
 
 Inside `import/` directory, some useful λ-expressions are already implemented.  
 Inside `examples/` directory, there are many examples of λ-expressions demonstrating pLam's capabilities.
 
-_**Coming soon:** Wiki pages on λ-calculus and computability; detailed description of pLam's syntax and semantics, existent libraries and capabilities with examples_
-
 ---
 
-## Prerequisites
+### Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
 
 On most Unix systems, you can get stack by typing:
@@ -24,7 +22,7 @@ wget -qO- https://get.haskellstack.org/ | sh
 ```
 On Windows, you can download 64-bit installer given at https://docs.haskellstack.org/en/stable/README/.
 
-## Build & Run
+## Build and Run
 ### First time setup
 1. clone project repository
 ```
@@ -58,6 +56,67 @@ Now, (and anytime in the future!), you can start pLam from anywhere in your syst
 ```
 plam
 ```
+---
+
+## pLam syntax and semantics
+
+### λ-expressions
+
+#### Variable
+λ-variable is required to be lowercase and a single letter. For example, `x` is a good λ-variable for pLam and `X`, `var`,... are not. There are also environment variables (names for defined λ-expressions) which are every string that is not parsed as λ-variable, λ-abstraction or λ-application.
+
+#### Abstraction
+λ-abstraction is written the same as in the language of pure (untyped) λ-calculus, except that pLam treats a symbol `\` as `λ` and it is required to write a space after `.`. For example, `λx.λy.x` would be written `\x. \y. x` in pLam. One can also write λ-abstraction in the curried form: `\xy. x` or `\x y. x`.
+
+#### Application
+λ-application is written like 2 λ-expressions separated by a space, for example `(\x. x) (\xy.x)` or `(\x. x) MyExpression` or `myexp1 myexp2`. Brackets `(` and `)` are used as usual and are not required to be written for application association; the default association is to the left, so `M N P` is parsed as `(M N) P` and one only needs to specify with brackets if the intended expression should be `M (N P)`.
+
+### Commands
+A block of code in pLam is a line, and possible lines (commands) are the following:
+
+#### Define
+
+- syntax: `<string> = <λ-expression>`
+- semantics: let the `<string>` be a name for `<λ-expression>`.
+- examples: `T = \x y. x`, `myexpression = T (T (\x. x) T) T`
+- restriction: `<string>` needs to be of length>1 or starting with uppercase letter
+
+#### Evaluate
+
+- syntax: `<λ-expression>` or `:d <λ-expression>`
+- semantics: reduce the `<λ-expression>` to β-normal form. If `:d` is put in front of expression, all the reduction steps will be shown (manually or automatic, depends on what one chooses when asked)
+- example: `\x y. x`, `:d T (T (\x. x) T) T`
+- restriction: none
+
+#### Import
+
+- syntax: `:import <string>`
+- semantics: put all the expressions defined in the file `import/<string>.plam` into the list of environment variables.
+- example: `:import std`
+- restriction: `<string>.plam` has to be inside `import/` directory within the pLam project directory
+
+#### Comment
+
+- syntax: `--<string>`
+- semantics: a comment line
+- example: `-- this is a comment`
+- restriction: none
+
+#### Run
+
+- syntax: `:run <string>`
+- semantics: runs a `.plam` file with relative path `<string>.plam`
+- example: `:run <relative-path-to-plam>/examples/2.5.2`
+- restrictions: `~` for home does not work
+
+#### Print
+
+- syntax: `:print <string>`
+- semantics: prints `<string>` to a new line. It mostly makes sense to use it in .plam programs to be executed, not in interactive mode where a comment should do the job better.
+- example: `:print this is a message`
+- restrictions: none
+
+---
 
 ## Examples
 
@@ -179,6 +238,7 @@ Goodbye!
 ```
 
 ---
+_**Coming soon:** Wiki pages on λ-calculus and computability, existent pLam libraries and capabilities with more examples._
 
 **Disclaimer for Haskell experts**  
 I am not a Haskell expert. In fact, this is my first and only Haskell project. It is inevitable that existing code could be written better and I wish to do it in the upcoming future.  
