@@ -157,6 +157,21 @@ pLam>
 ```
 
 ### Factorial
+#### "standard" way
+```
+pLam> :import std
+pLam> 
+pLam> fact0 = \f. \x. (isZc x) 1 (mul x (f (Pc x)))
+pLam> Y = \f. (\x. f(x x)) (\x. f(x x))
+pLam> fact = Y fact0
+pLam>
+pLam> fact 3
+> reductions count              : 646
+> uncurried β-normal form       : (λfx. f (f (f (f (f (f x))))))
+> curried (partial) α-equivalent: 6
+pLam>
+```
+#### primitive recursive way
 ```
 pLam> :import std
 pLam> :import comp
