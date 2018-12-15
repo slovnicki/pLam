@@ -9,6 +9,42 @@ Inside `examples/` directory, there are many examples of λ-expressions demonstr
 
 ---
 
+### Table of contents
+
+- [Prerequisites](#prerequisites)
+- [Build and Run](#buildrun)
+  - [First time setup](#fts)
+  - [Building](#build)
+  - [Running (locally)](#runl)
+  - [Running (globally)](#rung)
+- [Syntax and Semantics](#synsem)
+  - [λ-expressions](#expr)
+    - [Variable](#var)
+    - [Abstraction](#abs)
+    - [Application](#app)
+  - [Commands](#commands)
+    - [Defina](#def)
+    - [Evaluate](#eval)
+    - [Import](#imp)
+    - [Comment](#comm)
+    - [Run](#run)
+    - [Print](#print)
+- [Examples](#examples)
+  - [Fun with booleans](#fwb)
+    - [Redex coloring](#rc)
+  - [Fun with arithmetic](#fwa)
+  - [Factorial](#fact)
+    - [Standard way](#sw)
+    - [Primitive recursive way](#prw)
+  - [Minimization](#min)
+    - [Interactive coding](#int)
+    - [Running the existing program](#runex)
+    - [Running the existing program (without entering pLam's shell)](#runout)
+  - [Binary numerals](#bin)
+- [Additional notes](#additional)
+
+<a name="prerequisites"/>
+
 ### Prerequisites
 This project builds using Haskell tool stack documented at https://docs.haskellstack.org/en/stable/README/.
 
@@ -22,7 +58,12 @@ wget -qO- https://get.haskellstack.org/ | sh
 ```
 On Windows, you can download 64-bit installer given at https://docs.haskellstack.org/en/stable/README/.
 
+<a name="buildrun"/>
+
 ## Build and Run
+
+<a name="fts"/>
+
 ### First time setup
 1. clone project repository
 ```
@@ -36,16 +77,22 @@ cd pLam
 ```
 stack setup
 ```
+<a name="build"/>
+
 ### Building
 4. use stack to build project
 ```
 stack build
 ```
+<a name="runl"/>
+
 ### Running (locally)
 5.a) use stack to run project executable from project's directory
 ```
 stack exec plam
 ```
+<a name="rung"/>
+
 ### Running (globally (Unix systems))
 5.b) use `make_global.sh` script to create a global command 'plam' that can be used to start pLam from anywhere in your system. The script will also change your import path in src/Config.hs so you need to build the project again.
 ```
@@ -57,22 +104,35 @@ Now, (and anytime in the future!), you can start pLam from anywhere in your syst
 plam
 ```
 ---
+<a name="synsem"/>
 
-## pLam syntax and semantics
+## Syntax and semantics
+
+<a name="expr"/>
 
 ### λ-expressions
+
+<a name="var"/>
 
 #### Variable
 λ-variable is required to be lowercase and a single letter. For example, `x` is a good λ-variable for pLam and `X`, `var`,... are not. There are also environment variables (names for defined λ-expressions) which are every string that is not parsed as λ-variable, λ-abstraction or λ-application.
 
+<a name="abs"/>
+
 #### Abstraction
 λ-abstraction is written the same as in the language of pure (untyped) λ-calculus, except that pLam treats a symbol `\` as `λ` and it is required to write a space after `.`. For example, `λx.λy.x` would be written `\x. \y. x` in pLam. One can also write λ-abstraction in the curried form: `\xy. x` or `\x y. x`.
+
+<a name="app"/>
 
 #### Application
 λ-application is written like 2 λ-expressions separated by a space, for example `(\x. x) (\xy.x)` or `(\x. x) MyExpression` or `myexp1 myexp2`. Brackets `(` and `)` are used as usual and are not required to be written for application association; the default association is to the left, so `M N P` is parsed as `(M N) P` and one only needs to specify with brackets if the intended expression should be `M (N P)`.
 
+<a name="commands"/>
+
 ### Commands
 A block of code in pLam is a line, and possible lines (commands) are the following:
+
+<a name="def"/>
 
 #### Define
 
@@ -81,12 +141,16 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - examples: `T = \x y. x`, `myexpression = T (T (\x. x) T) T`
 - restriction: `<string>` needs to be of length>1 or starting with uppercase letter
 
+<a name="eval"/>
+
 #### Evaluate
 
 - syntax: `<λ-expression>` or `:d <λ-expression>`
 - semantics: reduce the `<λ-expression>` to β-normal form. If `:d` is put in front of expression, all the reduction steps will be shown (manually or automatic, depends on what one chooses when asked)
 - example: `\x y. x`, `:d T (T (\x. x) T) T`
 - restriction: none
+
+<a name="imp"/>
 
 #### Import
 
@@ -95,6 +159,8 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - example: `:import std`
 - restriction: `<string>.plam` has to be inside `import/` directory within the pLam project directory
 
+<a name="comm"/>
+
 #### Comment
 
 - syntax: `--<string>`
@@ -102,12 +168,16 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - example: `-- this is a comment`
 - restriction: none
 
+<a name="run"/>
+
 #### Run
 
 - syntax: `:run <string>`
 - semantics: runs a `.plam` file with relative path `<string>.plam`
 - example: `:run <relative-path-to-plam>/examples/2.5.2`
 - restrictions: `~` for home does not work
+
+<a name="print"/>
 
 #### Print
 
@@ -118,10 +188,14 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 
 ---
 
+<a name="examples"/>
+
 ## Examples
 
 **NOTE:** Output might be slightly different due to constant fixes and changes. Fully updated examples will be put each time they diverge too far from current.  
 All the examples can be found in `examples/` directory.
+
+<a name="fwb"/>
 
 ### Fun with booleans
 ```
@@ -142,8 +216,12 @@ pLam> and (or F (not F)) (xor T F)
 pLam>
 ```
 
+<a name="rc"/>
+
 #### Redex coloring
 ![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/redex_coloring.png "Redex Coloring")
+
+<a name="fwa"/>
 
 ### Fun with arithmetic
 ```
@@ -156,7 +234,12 @@ pLam> mul (add 2 (Sc 2)) (sub (exp 2 3) (Pc 8))
 pLam> 
 ```
 
+<a name="fact"/>
+
 ### Factorial
+
+<a name="sw"/>
+
 #### "standard" way
 ```
 pLam> :import std
@@ -171,6 +254,9 @@ pLam> fact 3
 > curried (partial) α-equivalent: 6
 pLam>
 ```
+
+<a name="prw"/>
+
 #### primitive recursive way
 ```
 pLam> :import std
@@ -183,8 +269,12 @@ pLam> fact 3
 > curried (partial) α-equivalent: 6
 pLam> 
 ```
+<a name="min"/>
 
 ### Minimization
+
+<a name="int"/>
+
 #### interactive coding:
 ```
 pLam> :import std
@@ -197,6 +287,9 @@ pLam> MIN1 fun
 > curried (partial) α-equivalent: 2
 pLam> 
 ```
+
+<a name="runex"/>
+
 #### running the existing program:
 ```
 pLam> :run examples/2.5.2
@@ -208,6 +301,9 @@ pLam> :run examples/2.5.2
 > curried (partial) α-equivalent: 2
 pLam>
 ```
+
+<a name="runout"/>
+
 #### running the existing program (without entering pLam's shell):
 ```
 plam ~/Projects/pLam/examples/2.5.2.plam
@@ -219,6 +315,8 @@ plam ~/Projects/pLam/examples/2.5.2.plam
 > curried (partial) α-equivalent: 2
 Done.
 ```
+
+<a name="bin"/>
 
 ### Binary numerals
 ```
@@ -251,6 +349,8 @@ pLam>
 pLam> :quit
 Goodbye!
 ```
+
+<a name="additional"/>
 
 ---
 _**Coming soon:** Wiki pages on λ-calculus and computability, existent pLam libraries and capabilities with more examples._
