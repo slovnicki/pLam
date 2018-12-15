@@ -23,7 +23,7 @@ Inside `examples/` directory, there are many examples of λ-expressions demonstr
     - [Abstraction](#abs)
     - [Application](#app)
   - [Commands](#commands)
-    - [Defina](#def)
+    - [Define](#def)
     - [Evaluate](#eval)
     - [Import](#imp)
     - [Comment](#comm)
