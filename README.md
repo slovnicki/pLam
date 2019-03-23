@@ -84,6 +84,11 @@ stack setup
 ```
 stack build
 ```
+**note:** if build was not successful, it may be due to:
+
+- curses library
+  - the solution is to install it (on Ubuntu: `sudo apt-get install libncurses5-dev libncursesw5-dev`)
+
 <a name="runl"/>
 
 ### Running (locally)
