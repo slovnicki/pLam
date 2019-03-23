@@ -162,6 +162,9 @@ repl env = do
         Just ":quit" -> do
             outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
             return ()
+        Just ":q" -> do
+            outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
+            return ()
         Just line -> do
             env' <- execute line env
             repl env'
