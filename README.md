@@ -1,3 +1,4 @@
+[![Version](https://img.shields.io/github/release/sandrolovnicki/pLam.svg)]()
 [![Github All Releases](https://img.shields.io/github/downloads/sandrolovnicki/pLam/total.svg)]()
 
 <p align="center">
