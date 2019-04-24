@@ -1,3 +1,5 @@
+[![Github All Releases](https://img.shields.io/github/downloads/sandrolovnicki/pLam/total.svg)]()
+
 <p align="center">
   <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
 </p>
