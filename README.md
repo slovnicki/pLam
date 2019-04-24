@@ -1,5 +1,5 @@
 [![Version](https://img.shields.io/github/release/sandrolovnicki/pLam.svg)]()
-[![Github All Releases](https://img.shields.io/github/downloads/sandrolovnicki/pLam/total.svg)]()
+[![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)]()
 
 <p align="center">
   <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
