@@ -140,6 +140,15 @@ execJustProg (line:ls) env =
                         Right exp -> do
                             showProgResult env exp 0
                             execJustProg ls env'
+                ShowDetailed e -> do
+                    let (res, env') = (evalExp e) `runState` env
+                    case res of
+                        Left err -> do
+                            putStrLn (show err)
+                            return env
+                        Right exp -> do
+                            autoProgReduce env exp 0
+                            execJustProg ls env'
                 Print s -> do
                     putStrLn s
                     execJustProg ls env

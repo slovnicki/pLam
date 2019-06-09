@@ -143,5 +143,16 @@ autoReduce env exp num = do
         False -> do
             outputStrLn ("--- no beta redexes.") 
             showResult env exp num
+            
+autoProgReduce :: Environment -> Expression -> Int -> IO ()
+autoProgReduce env exp num = do
+    putStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
+    case (hasBetaRedex exp) of
+        True -> do
+            let e2b = betaReduction num exp
+            autoProgReduce env (fst e2b) (snd e2b)        
+        False -> do
+            putStrLn ("--- no beta redexes.") 
+            showProgResult env exp num
 
 -------------------------------------------------------------------------------------
