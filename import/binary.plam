@@ -114,4 +114,10 @@ mulB = \x y. mulB0 x y 0b
 -- primitive recursion, version 0
 --PR0 = \G H. (Y (\f k. (isZbin k) G (H k (f (PB k)))))
 
+---------------------
+-- comparisons
+--===================
+leqB = \m n. isZbin (subBs m n)
+greB = \m n. not (leqB m n) 
+
 
