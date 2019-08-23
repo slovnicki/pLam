@@ -75,11 +75,11 @@ createBinary 0 = Application (Application pair false) end
 createBinary n = createBinary' n
 
 -- LIST --
-empty = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'l' 0) (Variable (LambdaVar 'x' 0)))
+empty = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0) (Variable (LambdaVar 'f' 0)))
 
 createList :: [Expression] -> Expression
 createList [] = empty
-createList (x:xs) = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'l' 0) (Application (Application (Variable (LambdaVar 'l' 0)) x) (createList xs)))
+createList (x:xs) = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0) (Application (Application (Variable (LambdaVar 'l' 0)) x) (createList xs)))
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
