@@ -11,27 +11,25 @@ or = \x y. x T y
 xor = \x y. x (not y) y
 if = \p x y. p x y
 
---------------------------
---value = \v. (\h. h v)
---extract = \k. k (\u. u)
---inc = \g h. h (g f)
---init = \h. h x
---const = \u. x
---samenum = \n. \f x. extract (n inc init)
---pred0 = \n. \f x. extract (n inc const)
-
 --------------- ARITHMETIC ----------------
-Sc = \n f x. f (n f x)
-Pc = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
+S = \n f x. f (n f x)
+P = \n f x. n (\g h. h (g f)) (\u. x) (\u. u)
 add = \m n f x. (m f (n f x))
-sub = \m n. (n Pc) m
+sub = \m n. (n P) m
 mul = \m n f. m (n f)
 exp = \m n f x. n m f x
 
 --------------- PREDICATES ----------------
-isZc = \n. n (\x. F) T
-leq = \m n. isZc (sub m n)
+isZ = \n. n (\x. F) T
+leq = \m n. isZ (sub m n)
+gre = \m n. not (leq m n)
 eq = \m n. and (leq m n) (leq n m)
 
 ----------------- OMEGA -------------------
 omega = (\x. x x) (\x. x x)
+
+-----------------   Y   -------------------
+Y = \f. (\x. f (x x)) (\x. f (x x))
+
+------------------  ID  -------------------
+id = \x. x
