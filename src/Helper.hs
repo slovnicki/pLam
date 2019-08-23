@@ -69,7 +69,7 @@ findChurch exp num = do
     case (exp == (createChurch num (Variable (LambdaVar 'x' 0)))) of
         True -> show num
         False -> do
-            case num==99 of
+            case num==199 of
                 True -> "none"
                 False -> findChurch exp (num+1)
 
