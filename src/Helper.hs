@@ -100,59 +100,57 @@ showResult :: Environment -> Expression -> Int -> InputT IO ()
 showResult env exp num = do
     let expnf = betaNF 0 exp
     let count = goodCounter num (snd expnf)
-    outputStrLn ("> reductions count              : " ++ show count)
-    outputStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
-    outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
+    outputStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;32m" ++ show count)
+    outputStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show (fst expnf))
+    outputStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
 
 showProgResult :: Environment -> Expression -> Int -> IO ()
 showProgResult env exp num = do
     let expnf = betaNF 0 exp
     let count = goodCounter num (snd expnf)
-    putStrLn ("> reductions count              : " ++ show count)
-    putStrLn ("> uncurried β-normal form       : " ++ show (fst expnf))
-    putStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
+    putStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;32m" ++ show count)
+    putStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show (fst expnf))
+    putStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNames False False (Variable (LambdaVar '.' 0)) env (fst expnf))
     
 
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
 manualReduce env exp num = do 
-    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
-    line <- getInputLine "Continue? [Y/n]"
+    outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m" ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
+    line <- getInputLine "\x1b[1;33mNext step?\x1b[0m [Y/n/f] (f: finish all remaining steps): "
     case line of
         Just "n" -> do
-            outputStrLn ("> reductions count              : " ++ show num)
-            outputStrLn ("> uncurried β-normal form       : " ++ show exp)
-            outputStrLn ("> curried (partial) α-equivalent: " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+            outputStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;32m" ++ show num)
+            outputStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show exp)
+            outputStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+        Just "f" -> autoReduce env exp num
         otherwise -> do
             case (hasBetaRedex exp) of
                 True -> do
                     let e2b = betaReduction num exp
                     manualReduce env (fst e2b) (snd e2b)
                 False -> do
-                    outputStrLn ("--- no beta redexes.")
                     showResult env exp num
 
 
 autoReduce :: Environment -> Expression -> Int -> InputT IO ()
 autoReduce env exp num = do
-    outputStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
+    outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     case (hasBetaRedex exp) of
         True -> do
             let e2b = betaReduction num exp
             autoReduce env (fst e2b) (snd e2b)        
         False -> do
-            outputStrLn ("--- no beta redexes.") 
             showResult env exp num
             
 autoProgReduce :: Environment -> Expression -> Int -> IO ()
 autoProgReduce env exp num = do
-    putStrLn ("-- " ++ show num ++ ": " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
+    putStrLn ("#\x1b[1;35m" ++ show num ++ ":\x1b[0m " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     case (hasBetaRedex exp) of
         True -> do
             let e2b = betaReduction num exp
             autoProgReduce env (fst e2b) (snd e2b)        
         False -> do
-            putStrLn ("--- no beta redexes.") 
             showProgResult env exp num
 
 -------------------------------------------------------------------------------------
