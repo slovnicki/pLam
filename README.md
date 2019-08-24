@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)]()
 
 <p align="center">
-  <img width="900" height="745" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
+  <img width=100% height=auto src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
 </p>
 
 pLam (**p**ure **Lam**bda calculus) is a tool to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
