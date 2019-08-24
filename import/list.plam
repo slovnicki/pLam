@@ -1,0 +1,55 @@
+-------------------------------------
+--          LIST LIBRARY           --
+--=================================--
+-- implementation and manipulation --
+--        of ordered lists         --
+-------------------------------------
+
+----------------------------------------------------------------
+-- NOTE: pLam supports list definition as [expr1,expr2,...]   --
+-- [x,y] is a syntactic sugar for (append x (append y empty)) --
+-- i.e. λfl. l x (λfl. l y (λfl. f))                          --
+----------------------------------------------------------------
+
+:import std
+
+empty = \f l. f
+append = \h t f l. l h t
+
+head = \l. l F T
+tail = \l. l F F
+isEmpty = \l. l T (\x y. F)
+
+-- find Church numeral x in list l
+----------------------------------------------------------------
+fFind = \f. \x l c. (eq x (head l)) c (f x (tail l) (S c))
+Find = \x l. Y fFind x l 0
+
+-- get list element at index i
+----------------------------------------------------------------
+fGet = \f. \i l c. (eq i c) (head l) (f i (tail l) (S c))
+Get = \i l. Y fGet i l 0
+
+-- merge lists x and y
+----------------------------------------------------------------
+fMerge = \f. \x y. x y (\h t. append h (f t y))
+Merge = Y fMerge
+
+-- reverse list l
+----------------------------------------------------------------
+fReverse = \f. \l r. (isEmpty l) r (f (tail l) (append (head l) r))
+Reverse = \l. Y fReverse l empty
+
+-- remove elements of list l satisfying condition p
+----------------------------------------------------------------
+fRemove = \f. \p l. l empty (\h t. ((p h) (append h) id) (f p t))
+Remove = Y fRemove
+
+-- quick sort a list l of Church numerals in ascending order
+----------------------------------------------------------------
+fQSort = \f l. l empty (\h t. Merge (f (Remove (gre h) t)) (append h (f (Remove (leq h) t))))
+QSort = Y fQSort
+
+
+
+

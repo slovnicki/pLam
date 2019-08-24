@@ -13,7 +13,7 @@ import System.Console.Haskeline
 import System.Environment
 
 
-version = "1.3.1"
+version = "2.0.0"
 heading = "\x1b[1;36m\
 \         _\n\
 \        | |\n\
@@ -84,11 +84,11 @@ execute line env =
                         Left err -> outputStrLn $ show err
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
-                            op <- getInputLine "- type reduction option (a-auto, m-manual, [DEFAULT-fast]): "
+                            op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
                             case op of
                                 Just "a" -> autoReduce env exp 0
                                 Just "m" -> manualReduce env exp 0
-                                otherwise -> showResult env exp 0
+                                otherwise -> autoReduce env exp 0
                     return env
                 Import f -> do
                     content <- liftIO $ readFile (importPath ++ f ++ ".plam")

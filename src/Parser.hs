@@ -25,6 +25,9 @@ languageDef =
              , Token.reservedOpNames = [ "="
                                        , "." 
                                        , "\\"
+                                       , "["
+                                       , "]"
+                                       , ","
                                        ]
              }
 
@@ -61,6 +64,7 @@ whichBit :: Int -> Expression
 whichBit b
     | b == 0  = false
     | b == 1  = true
+
 ----------------
 createBinary' :: Int -> Expression
 createBinary' 0 = end
@@ -69,9 +73,23 @@ createBinary' n = Application (Application pair (whichBit (mod n 2))) (createBin
 createBinary :: Int -> Expression
 createBinary 0 = Application (Application pair false) end
 createBinary n = createBinary' n
+
+-- LIST --
+empty = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0) (Variable (LambdaVar 'f' 0)))
+
+createList :: [Expression] -> Expression
+createList [] = empty
+createList (x:xs) = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0) (Application (Application (Variable (LambdaVar 'l' 0)) x) (createList xs)))
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
+parseList :: Parser Expression
+parseList = do
+    reservedOp "["
+    exprs <- parseExpression `sepBy` (char ',')
+    reservedOp "]"
+    return $ createList exprs
+
 parseNumeral :: Parser Expression
 parseNumeral = do
     strNum <- many1 digit
@@ -106,7 +124,8 @@ parseApplication = do
   return $ foldl1 Application es
 
 parseSingleton :: Parser Expression
-parseSingleton =  parseNumeral
+parseSingleton =  parseList
+              <|> parseNumeral
               <|> parseVariable
               <|> parseAbstraction
               <|> parens parseApplication

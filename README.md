@@ -2,13 +2,12 @@
 [![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)]()
 
 <p align="center">
-  <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
+  <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
 </p>
 
-This programming language (pLam - **p**ure **Lam**bda calculus) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
+pLam (**p**ure **Lam**bda calculus) is a tool to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
 
-Inside `import/` directory, some useful λ-expressions are already implemented.  
-Inside `examples/` directory, there are many examples of λ-expressions demonstrating pLam's capabilities.
+Inside `import/` directory, many useful λ-expressions are already implemented to be used as libraries.
 
 ---
 
@@ -32,18 +31,21 @@ Inside `examples/` directory, there are many examples of λ-expressions demonstr
     - [Comment](#comm)
     - [Run](#run)
     - [Print](#print)
+  - [Syntactic Sugars](#syns)
+    - [Church numerals](#cn)
+    - [Binary numerals](#bn)
+    - [Lists](#lists)
 - [Examples](#examples)
   - [Fun with booleans](#fwb)
-    - [Redex coloring](#rc)
   - [Fun with arithmetic](#fwa)
   - [Factorial](#fact)
     - [Standard way](#sw)
     - [Primitive recursive way](#prw)
-  - [Minimization](#min)
-    - [Interactive coding](#int)
-    - [Running the existing program](#runex)
-    - [Running the existing program (without entering pLam's shell)](#runout)
   - [Binary numerals](#bin)
+  - [Lists](#liex)
+  - [Redex coloring](#rc)
+  - [Running the existing program](#runex)
+    - [Without entering pLam's shell](#runout)
 - [Additional notes](#additional)
 
 <a name="prerequisites"/>
@@ -194,6 +196,32 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - example: `:print this is a message`
 - restrictions: none
 
+<a name="syns"/>
+
+### Syntactic Sugars
+
+pLam is equipped with some (optional) shortcuts to work with often used expressions.  
+
+<a name="cn"/>
+
+### Church numerals
+
+Church numerals can be typed as `0`, `1`, `2`,... and pLam parses those integers as `λfx. x`, `λfx. f x`, `λfx. f (f x)`, ...
+
+<a name="bn"/>
+
+### Binary numerals
+
+Similar to handling Church numerals, pLam also handles binary numerals from `binary.plam` library. You can type them as `0b`, `1b`, `2b`, ...  which is them parsed as `λp. p (λxy. y) (λexy.x)`, `λp. p (λxy. x) (λexy.x)`, `λp. p (λxy. y) (λp. p (λxy. x) (λexy.x))`, ...  
+Note that binary numerals are nothing standard, but something I implemented, so I suppose the only documentation for them is here.
+
+<a name="lists"/>
+
+### Lists
+
+List encoding is pretty standard; `empty = T`, `append = λhtfl. l h t`, and you can use syntact sugar which parses `[1,2]` into `λfl. l 1 (λfl. l 2 empty)`, `[T,\x.x]` into `λfl. l T (λfl. l (λx.x) empty)` and so on...
+
+
 ---
 
 <a name="examples"/>
@@ -207,27 +235,13 @@ All the examples can be found in `examples/` directory.
 
 ### Fun with booleans
 ```
-         _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.1
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :import booleans
 pLam> 
 pLam> and (or F (not F)) (xor T F)
-> reductions count              : 18
-> uncurried β-normal form       : (λxy. x)
-> curried (partial) α-equivalent: T
-pLam>
+|> reductions count               : 18
+|> uncurried β-normal form        : (λxy. x)
+|> curried (partial) α-equivalent : T
 ```
-
-<a name="rc"/>
-
-#### Redex coloring
-![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/redex_coloring.png "Redex Coloring")
 
 <a name="fwa"/>
 
@@ -235,11 +249,10 @@ pLam>
 ```
 pLam> :import std
 pLam> 
-pLam> mul (add 2 (Sc 2)) (sub (exp 2 3) (Pc 8))
-> reductions count              : 762
-> uncurried β-normal form       : (λfx. f (f (f (f (f x)))))
-> curried (partial) α-equivalent: 5
-pLam> 
+pLam> mul (add 2 (S 2)) (sub (exp 2 3) (P 8))
+|> reductions count               : 762
+|> uncurried β-normal form        : (λfx. f (f (f (f (f x)))))
+|> curried (partial) α-equivalent : 5
 ```
 
 <a name="fact"/>
@@ -252,15 +265,13 @@ pLam>
 ```
 pLam> :import std
 pLam> 
-pLam> fact0 = \f. \x. (isZc x) 1 (mul x (f (Pc x)))
-pLam> Y = \f. (\x. f(x x)) (\x. f(x x))
-pLam> fact = Y fact0
-pLam>
-pLam> fact 3
-> reductions count              : 646
-> uncurried β-normal form       : (λfx. f (f (f (f (f (f x))))))
-> curried (partial) α-equivalent: 6
-pLam>
+pLam> fFact = \f. \x. (isZ x) 1 (mul x (f (P x)))
+pLam> Fact = Y fFact
+pLam> 
+pLam> Fact 3
+|> reductions count               : 646
+|> uncurried β-normal form        : (λfx. f (f (f (f (f (f x))))))
+|> curried (partial) α-equivalent : 6
 ```
 
 <a name="prw"/>
@@ -269,94 +280,95 @@ pLam>
 ```
 pLam> :import std
 pLam> :import comp
-pLam>
+pLam> 
 pLam> fact = PR0 1 (C22 mul (C2 S I12) I22)
 pLam> fact 3
-> reductions count              : 898
-> uncurried β-normal form       : (λfx. f (f (f (f (f (f x))))))
-> curried (partial) α-equivalent: 6
-pLam> 
-```
-<a name="min"/>
-
-### Minimization
-
-<a name="int"/>
-
-#### interactive coding:
-```
-pLam> :import std
-pLam> :import comp
-pLam> 
-pLam> fun = \x. mul (sub 2 x) (sub 3 x)
-pLam> MIN1 fun
-> reductions count              : 114
-> uncurried β-normal form       : (λfx. f (f x))
-> curried (partial) α-equivalent: 2
-pLam> 
-```
-
-<a name="runex"/>
-
-#### running the existing program:
-```
-pLam> :run examples/2.5.2
-=================================
-< zero
-=================================
-> reductions count              : 114
-> uncurried β-normal form       : (λfx. f (f x))
-> curried (partial) α-equivalent: 2
-pLam>
-```
-
-<a name="runout"/>
-
-#### running the existing program (without entering pLam's shell):
-```
-plam ~/Projects/pLam/examples/2.5.2.plam
-=================================
-< zero
-=================================
-> reductions count              : 114
-> uncurried β-normal form       : (λfx. f (f x))
-> curried (partial) α-equivalent: 2
-Done.
+|> reductions count               : 898
+|> uncurried β-normal form        : (λfx. f (f (f (f (f (f x))))))
+|> curried (partial) α-equivalent : 6
 ```
 
 <a name="bin"/>
 
 ### Binary numerals
 ```
-         _
-        | |
-    ____| |   ___  __  __
-    | _ \ |__| _ \|  \/  |
-    |  _/____|____\_\__/_| v1.3.1
-    |_| pure λ-calculus interpreter
-   =================================
-
 pLam> :import binary
-pLam>
+pLam> 
 pLam> 0b
-> reductions count              : 2
-> uncurried β-normal form       : (λp.((p (λxy. y)) (λexy.x)))
-> curried (partial) α-equivalent: 0b
+|> reductions count               : 2
+|> uncurried β-normal form        : (λp.((p (λxy. y)) (λexy.x)))
+|> curried (partial) α-equivalent : 0b
 pLam> 
 pLam> 2048b
-> reductions count              : 24
-> uncurried β-normal form       : (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. x)) (λexy.x)))))))))))))))))))))))))
-> curried (partial) α-equivalent: (λp. ((p F) 1024b))
-pLam>
-pLam>
+|> reductions count               : 24
+|> uncurried β-normal form        : (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. y)) (λp.((p (λxy. x)) (λexy.x)))))))))))))))))))))))))
+|> curried (partial) α-equivalent : (λp. ((p F) 1024b))
+pLam> 
 pLam> addB 7b (subBs 2b 3b)
-> reductions count              : 9458
-> uncurried β-normal form       : (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λexy.x)))))))
-> curried (partial) α-equivalent: 7b
-pLam>
-pLam> :quit
-Goodbye!
+|> reductions count               : 9458
+|> uncurried β-normal form        : (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λp.((p (λxy. x)) (λexy.x)))))))
+|> curried (partial) α-equivalent : 7b
 ```
+
+<a name="liex"/>
+
+### Lists
+
+```
+pLam> :import list
+pLam> 
+pLam> list = Merge [3,1] [2]
+pLam> rlist = Reverse list
+pLam> 
+pLam> Get 0 rlist
+|> reductions count               : 243
+|> uncurried β-normal form        : (λfx. f (f x))
+|> curried (partial) α-equivalent : 2
+pLam> Get 0 list
+|> reductions count               : 50
+|> uncurried β-normal form        : (λfx. f (f (f x)))
+|> curried (partial) α-equivalent : 3
+pLam> 
+pLam> QSort list
+|> reductions count               : 459
+|> uncurried β-normal form        : (λfl. (l (λfx. f x)) (λfl. (l (λfx. f (f x))) (λfl. (l (λfx. f (f (f x)))) (λfl. f))))
+|> curried (partial) α-equivalent : (λf. (λl. ((l 1) (λf. (λl. ((l 2) (λf. (λl. ((l 3) empty)))))))))
+
+```
+
+<a name="rc"/>
+
+#### Redex coloring
+![redex_coloring.png](https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/redex_coloring.png "Redex Coloring")
+
+
+<a name="runex"/>
+
+### Running the existing program:
+```
+pLam> :run examples/2.5.2
+=================================
+< zero
+=================================
+|> reductions count               : 114
+|> uncurried β-normal form        : (λfx. f (f x))
+|> curried (partial) α-equivalent : 2
+```
+
+<a name="runout"/>
+
+#### Without entering pLam's shell:
+```
+plam ~/Projects/pLam/examples/2.5.2.plam
+=================================
+< zero
+=================================
+|> reductions count               : 114
+|> uncurried β-normal form        : (λfx. f (f x))
+|> curried (partial) α-equivalent : 2
+Done.
+```
+
 
 <a name="additional"/>
 
