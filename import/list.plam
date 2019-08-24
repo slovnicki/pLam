@@ -20,6 +20,8 @@ head = \l. l F T
 tail = \l. l F F
 isEmpty = \l. l T (\x y. F)
 
+flip = \p x y. p y x
+
 -- find Church numeral x in list l
 ----------------------------------------------------------------
 fFind = \f. \x l c. (eq x (head l)) c (f x (tail l) (S c))
@@ -40,14 +42,13 @@ Merge = Y fMerge
 fReverse = \f. \l r. (isEmpty l) r (f (tail l) (append (head l) r))
 Reverse = \l. Y fReverse l empty
 
--- remove elements of list l satisfying condition p
-----------------------------------------------------------------
-fRemove = \f. \p l. l empty (\h t. ((p h) (append h) id) (f p t))
+-- remove elements of list l that satisfy condition p
+fRemove = \f. \p l. l empty (\h t. ((p h) id (append h)) (f p t))
 Remove = Y fRemove
 
 -- quick sort a list l of Church numerals in ascending order
 ----------------------------------------------------------------
-fQSort = \f l. l empty (\h t. Merge (f (Remove (gre h) t)) (append h (f (Remove (leq h) t))))
+fQSort = \f l. l empty (\h t. Merge (f (Remove (flip gre h) t)) (append h (f (Remove (flip leq h) t))))
 QSort = Y fQSort
 
 
