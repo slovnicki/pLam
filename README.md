@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)]()
 
 <p align="center">
-  <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo.gif">
+  <img width="860" height="559" src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
 </p>
 
 This programming language (pLam - **p**ure **Lam**bda calculus) is used to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
