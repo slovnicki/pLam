@@ -207,20 +207,20 @@ pLam is equipped with some (optional) shortcuts to work with often used expressi
 
 ### Church numerals
 
-Church numerals can be typed as `0`,`1`,`2`,... and pLam parses those integers as `λfx. x`,`λfx. f x`,`λfx. f (f x)`,...
+Church numerals can be typed as `0`, `1`, `2`,... and pLam parses those integers as `λfx. x`, `λfx. f x`, `λfx. f (f x)`, ...
 
 <a name="bn"/>
 
 ### Binary numerals
 
-Similar to handling Church numerals, pLam also handles binary numerals from `binary.plam` library. You can type them as `0b`,`1b`,`2b`,...  which is them parsed as `λp. p (λxy. y) (λexy.x)`,`λp. p (λxy. x) (λexy.x)`,`λp. p (λxy. y) (λp. p (λxy. x) (λexy.x))`,...  
-Not ehtat binary numerals are nothing standard, but something I implemented, so I suppose the only documentation for them is here.
+Similar to handling Church numerals, pLam also handles binary numerals from `binary.plam` library. You can type them as `0b`, `1b`, `2b`, ...  which is them parsed as `λp. p (λxy. y) (λexy.x)`, `λp. p (λxy. x) (λexy.x)`, `λp. p (λxy. y) (λp. p (λxy. x) (λexy.x))`, ...  
+Note that binary numerals are nothing standard, but something I implemented, so I suppose the only documentation for them is here.
 
 <a name="lists"/>
 
 ### Lists
 
-List encoding is pretty standard; `empt = T`, `append = λhtfl. l h t` and in pLam you can use syntact sugar which parses `[1,2]` into `λfl. l 1 (λfl. l 2 empty)`, `[T,\x.x]` into `λfl. l T (λfl. l (λx.x) empty)` and so on...
+List encoding is pretty standard; `empty = T`, `append = λhtfl. l h t`, and you can use syntact sugar which parses `[1,2]` into `λfl. l 1 (λfl. l 2 empty)`, `[T,\x.x]` into `λfl. l T (λfl. l (λx.x) empty)` and so on...
 
 
 ---
