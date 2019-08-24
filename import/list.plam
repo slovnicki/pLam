@@ -24,12 +24,12 @@ flip = \p x y. p y x
 
 -- find Church numeral x in list l
 ----------------------------------------------------------------
-fFind = \f. \x l c. (eq x (head l)) c (f x (tail l) (S c))
+fFind = \f. \x l c. (isEmpty l) empty ((eq x (head l)) c (f x (tail l) (S c)))
 Find = \x l. Y fFind x l 0
 
 -- get list element at index i
 ----------------------------------------------------------------
-fGet = \f. \i l c. (eq i c) (head l) (f i (tail l) (S c))
+fGet = \f. \i l c. (isEmpty l) empty ((eq i c) (head l) (f i (tail l) (S c)))
 Get = \i l. Y fGet i l 0
 
 -- merge lists x and y
