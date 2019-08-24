@@ -71,8 +71,11 @@ sub x n (Abstraction y@(LambdaVar name num) p)
 alphaEquiv :: Expression -> Expression -> Bool
 alphaEquiv (Variable x) (Variable y)   = x == y
 alphaEquiv (Application a b) (Application x y) = alphaEquiv a x && alphaEquiv b y
-alphaEquiv (Abstraction x f) (Abstraction y g) =
-  alphaEquiv f $ sub y (Variable x) g
+alphaEquiv abs1@(Abstraction v1 (Variable w1)) abs2@(Abstraction v2 (Variable w2))
+  | v1 == w1 && v2 /= w2 = False
+  | v1 /= w1 && v2 == w2 = False
+  | otherwise = True
+alphaEquiv (Abstraction x f) (Abstraction y g) = alphaEquiv f $ sub y (Variable x) g
 alphaEquiv _ _ = False
 
 --------------------------------------------------------------------------------
