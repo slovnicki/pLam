@@ -57,15 +57,15 @@ Inside `import/` directory, many useful λ-expressions are already implemented t
 
 <a name="aur"/>
 
-## Arch Linux
+### Arch Linux
 
-pLam's AUR package is [here](https://aur.archlinux.org/packages/plam) thanks to @Xmgplays.   
+pLam's AUR package is at https://aur.archlinux.org/packages/plam thanks to @Xmgplays.   
 
 Git Clone URL: https://aur.archlinux.org/plam.git
 
 <a name="deb"/>
 
-## Debian
+### Debian
 
 (coming soon...)
 
