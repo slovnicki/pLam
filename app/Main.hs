@@ -100,7 +100,7 @@ execute line env =
                     if not fileExists
                         then do
                             outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
-                            liftIO $ mapM_ (saveGlobal outFile) env
+                            liftIO $ mapM_ (saveGlobal outFile) (reverse env)
                             liftIO $ hClose outFile
                             outputStrLn("--- exported to " ++ f ++ " sucessful.")
                         else do
