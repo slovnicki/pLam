@@ -11,6 +11,7 @@ import Debug.Trace
 import System.Exit
 import System.Console.Haskeline
 import System.Environment
+import System.Directory (doesFileExist)
 
 
 version = "2.0.0"
@@ -95,10 +96,15 @@ execute line env =
                     let exprs = lines content
                     execAll exprs env
                 Export f -> do
-                    outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
-                    liftIO $ mapM_ (saveGlobal outFile) env
-                    liftIO $ hClose outFile
-                    outputStrLn("--- exported to " ++ f ++ " sucessful.")
+                    fileExists <- liftIO $ doesFileExist (importPath ++ f ++ ".plam")
+                    if not fileExists
+                        then do
+                            outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
+                            liftIO $ mapM_ (saveGlobal outFile) env
+                            liftIO $ hClose outFile
+                            outputStrLn("--- exported to " ++ f ++ " sucessful.")
+                        else do
+                            outputStrLn("--- export failed : " ++ f ++ " already exists")
                     return env
                 Review r -> do
                     case r of
