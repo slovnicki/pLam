@@ -197,7 +197,7 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - syntax `:export <string<`
 - semantics: put all the expressions in the list of environment variables into the file `import/<string>.plam`
 - example: `:export test`
-- restriction: `<string>.plam cannot already exist
+- restriction: `<string>.plam` cannot already exist
 
 <a name="comm"/>
 
