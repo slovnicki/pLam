@@ -14,6 +14,9 @@ import System.Console.Haskeline
 showGlobal :: (String, Expression) -> InputT IO ()
 showGlobal (n, e) = outputStrLn ("--- " ++ show n ++ " = " ++ show e)
 
+printGlobal :: (String, Expression) -> IO ()
+printGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
+
 removeLambda :: String -> String
 removeLambda target =
     let

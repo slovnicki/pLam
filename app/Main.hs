@@ -161,6 +161,13 @@ execJustProg (line:ls) env =
                         Right exp -> do
                             autoProgReduce env exp 0
                             execJustProg ls env'
+                Review r -> do
+                    case r of
+                       "all" -> do
+                           putStrLn " ENVIRONMENT:"
+                           mapM_ printGlobal env
+                       otherwise -> putStrLn ("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
+                    execJustProg ls env
                 Print s -> do
                     putStrLn s
                     execJustProg ls env
