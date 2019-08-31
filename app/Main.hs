@@ -6,7 +6,7 @@ import Reducer
 import Helper
 
 import Control.Monad.State
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, hPutStrLn, hClose, openFile, IOMode(WriteMode))
 import Debug.Trace
 import System.Exit
 import System.Console.Haskeline
@@ -93,7 +93,13 @@ execute line env =
                 Import f -> do
                     content <- liftIO $ readFile (importPath ++ f ++ ".plam")
                     let exprs = lines content
-                    execAll exprs env                  
+                    execAll exprs env
+                Export f -> do
+                    outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
+                    liftIO $ mapM_ (saveGlobal outFile) env
+                    liftIO $ hClose outFile
+                    outputStrLn("--- exported to " ++ f ++ " sucessful.")
+                    return env
                 Review r -> do
                     case r of
                        "all" -> do
