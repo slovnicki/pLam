@@ -102,7 +102,7 @@ execute line env =
                             outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
                             liftIO $ mapM_ (saveGlobal outFile) (reverse env)
                             liftIO $ hClose outFile
-                            outputStrLn("--- exported to " ++ f ++ " sucessful.")
+                            outputStrLn("--- successfully exported to import/" ++ f ++ ".plam")
                         else do
                             outputStrLn("--- export failed : " ++ f ++ " already exists")
                     return env
