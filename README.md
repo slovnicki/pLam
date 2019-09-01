@@ -31,6 +31,7 @@ Inside `import/` directory, many useful λ-expressions are already implemented t
     - [Define](#def)
     - [Evaluate](#eval)
     - [Import](#imp)
+    - [Export](#exp)
     - [Comment](#comm)
     - [Run](#run)
     - [Print](#print)
