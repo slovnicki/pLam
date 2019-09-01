@@ -31,6 +31,7 @@ Inside `import/` directory, many useful λ-expressions are already implemented t
     - [Define](#def)
     - [Evaluate](#eval)
     - [Import](#imp)
+    - [Export](#exp)
     - [Comment](#comm)
     - [Run](#run)
     - [Print](#print)
@@ -189,6 +190,15 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 - semantics: put all the expressions defined in the file `import/<string>.plam` into the list of environment variables.
 - example: `:import std`
 - restriction: `<string>.plam` has to be inside `import/` directory within the pLam project directory
+
+<a name="exp"/>
+
+### Export
+
+- syntax `:export <string<`
+- semantics: put all the expressions in the list of environment variables into the file `import/<string>.plam`
+- example: `:export test`
+- restriction: `<string>.plam` cannot already exist
 
 <a name="comm"/>
 

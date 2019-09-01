@@ -5,7 +5,7 @@ import Reducer
 import Parser
 
 import Control.Monad.State
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, Handle, hPutStrLn)
 import Debug.Trace
 import System.Console.Haskeline
 
@@ -13,6 +13,19 @@ import System.Console.Haskeline
 -------------------------------------------------------------------------------------
 showGlobal :: (String, Expression) -> InputT IO ()
 showGlobal (n, e) = outputStrLn ("--- " ++ show n ++ " = " ++ show e)
+
+printGlobal :: (String, Expression) -> IO ()
+printGlobal (n, e) = putStrLn ("--- " ++ show n ++ " = " ++ show e)
+
+removeLambda :: String -> String
+removeLambda target =
+    let
+        repl 'λ' = '\\'
+        repl  c  =  c
+    in map repl target
+    
+saveGlobal :: Handle -> (String, Expression) -> IO ()
+saveGlobal h (n, e) = hPutStrLn h (n ++ " = " ++ (removeLambda (show e)))
 
 convertToName :: Environment -> Expression -> String
 convertToName [] exp = findNumeral exp

@@ -43,6 +43,7 @@ data Command = Define String Expression
              | Show Expression
              | ShowDetailed Expression
              | Import String
+             | Export String
              | Review String
              | Comment String
              | Run String

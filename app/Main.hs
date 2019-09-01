@@ -6,14 +6,15 @@ import Reducer
 import Helper
 
 import Control.Monad.State
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, hPutStrLn, hClose, openFile, IOMode(WriteMode))
 import Debug.Trace
 import System.Exit
 import System.Console.Haskeline
 import System.Environment
+import System.Directory (doesFileExist)
 
 
-version = "2.0.0"
+version = "2.1.0"
 heading = "\x1b[1;36m\
 \         _\n\
 \        | |\n\
@@ -93,7 +94,18 @@ execute line env =
                 Import f -> do
                     content <- liftIO $ readFile (importPath ++ f ++ ".plam")
                     let exprs = lines content
-                    execAll exprs env                  
+                    execAll exprs env
+                Export f -> do
+                    fileExists <- liftIO $ doesFileExist (importPath ++ f ++ ".plam")
+                    if not fileExists
+                        then do
+                            outFile <- liftIO $ openFile (importPath ++ f ++ ".plam") WriteMode
+                            liftIO $ mapM_ (saveGlobal outFile) (reverse env)
+                            liftIO $ hClose outFile
+                            outputStrLn("--- successfully exported to import/" ++ f ++ ".plam")
+                        else do
+                            outputStrLn("--- export failed : " ++ f ++ " already exists")
+                    return env
                 Review r -> do
                     case r of
                        "all" -> do
@@ -149,6 +161,13 @@ execJustProg (line:ls) env =
                         Right exp -> do
                             autoProgReduce env exp 0
                             execJustProg ls env'
+                Review r -> do
+                    case r of
+                       "all" -> do
+                           putStrLn " ENVIRONMENT:"
+                           mapM_ printGlobal env
+                       otherwise -> putStrLn ("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
+                    execJustProg ls env
                 Print s -> do
                     putStrLn s
                     execJustProg ls env

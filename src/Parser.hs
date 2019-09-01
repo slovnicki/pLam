@@ -164,6 +164,13 @@ parseImport = do
     f <- filename
     return $ Import f
 
+parseExport :: Parser Command
+parseExport = do
+    reserved ":export"
+    spaces
+    f <- filename
+    return $ Export f
+
 parseReview :: Parser Command
 parseReview = do
     reserved ":review"
@@ -200,12 +207,14 @@ parseLine :: Parser Command
 parseLine =  try parseDefine
          <|> parseShowDetailed
          <|> parseImport
+         <|> parseExport
          <|> parseReview
          <|> parseRun
          <|> parsePrint
          <|> parseComment
          <|> parseShow
          <|> parseEmptyLine
+         
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
