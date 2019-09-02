@@ -5,7 +5,7 @@
   <img width=100% height=auto src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
 </p>
 
-pLam (**p**ure **Lam**bda calculus) is a tool to explore, test and implement various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
+pLam (**p**ure **Lam**bda calculus) is a tool to explore, define and evaluate various λ-expressions. Code written in pLam can be executed interactively within pLam's shell or stored in a file with `.plam` extension and run anytime.
 
 Inside `import/` directory, many useful λ-expressions are already implemented to be used as libraries.
 
