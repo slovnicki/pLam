@@ -27,7 +27,6 @@ languageDef =
                                        , "\\"
                                        , "["
                                        , "]"
-                                       , ","
                                        ]
              }
 
@@ -37,6 +36,7 @@ identifier = Token.identifier lexer
 reserved   = Token.reserved   lexer 
 reservedOp = Token.reservedOp lexer 
 parens     = Token.parens     lexer
+comma      = Token.comma      lexer
 -------------------------------------------------------------------------------------
 
 type Parser = Parsec String ()
@@ -86,13 +86,14 @@ createList (x:xs) = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0)
 parseList :: Parser Expression
 parseList = do
     reservedOp "["
-    exprs <- parseExpression `sepBy` (char ',')
+    exprs <- parseExpression `sepBy` comma
     reservedOp "]"
     return $ createList exprs
 
 parseNumeral :: Parser Expression
 parseNumeral = do
     strNum <- many1 digit
+    spaces
     let intNum = read strNum :: Int
     maybeB <- optionMaybe (char 'b') 
     case maybeB == (Just 'b') of
@@ -131,8 +132,11 @@ parseSingleton =  parseList
               <|> parens parseApplication
 
 parseExpression :: Parser Expression
-parseExpression =  parseApplication
-               <|> parseSingleton
+parseExpression = do
+  spaces
+  expr <- parseApplication <|> parseSingleton
+  spaces
+  return expr
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
