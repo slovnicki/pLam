@@ -133,8 +133,11 @@ parseSingleton =  parseList
               <|> parens parseApplication
 
 parseExpression :: Parser Expression
-parseExpression =  parseApplication
-               <|> parseSingleton
+parseExpression = do
+  spaces
+  expr <- parseApplication <|> parseSingleton
+  spaces
+  return expr
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
