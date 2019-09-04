@@ -27,7 +27,6 @@ languageDef =
                                        , "\\"
                                        , "["
                                        , "]"
-                                       , ","
                                        ]
              }
 
@@ -87,7 +86,7 @@ createList (x:xs) = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0)
 parseList :: Parser Expression
 parseList = do
     reservedOp "["
-    exprs <- parseExpression `sepBy` (comma)
+    exprs <- parseExpression `sepBy` comma
     reservedOp "]"
     return $ createList exprs
 
