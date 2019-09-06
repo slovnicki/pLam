@@ -139,22 +139,25 @@ goodCounter num rednum | rednum==0 = num
                        | otherwise = rednum
 
 -------------------------------------------------------------------------------------
-showResult :: Environment -> Expression -> Int -> InputT IO ()
-showResult env exp num = do
+showResult :: Environment -> Expression -> Int -> String
+showResult env exp num =
     let expnf = betaNF 0 exp
-    let count = goodCounter num (snd expnf)
-    outputStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;31m" ++ show count)
-    outputStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show (fst expnf))
-    outputStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNamesResult False False (Variable (LambdaVar '.' 0)) env (fst expnf))
+        count = goodCounter num (snd expnf)
+    in
+        showSummary env (fst expnf) count
 
-showProgResult :: Environment -> Expression -> Int -> IO ()
-showProgResult env exp num = do
+showProgResult :: Environment -> Expression -> Int -> String
+showProgResult env exp num =
     let expnf = betaNF 0 exp
-    let count = goodCounter num (snd expnf)
-    putStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;31m" ++ show count)
-    putStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show (fst expnf))
-    putStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNamesResult False False (Variable (LambdaVar '.' 0)) env (fst expnf))
-    
+        count = goodCounter num (snd expnf)
+    in
+        showSummary env (fst expnf) count
+
+showSummary :: Environment -> Expression -> Int -> String
+showSummary env exp count =
+    "\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;31m" ++ show count ++ "\n" ++
+    "\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show exp ++ "\n" ++
+    "\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNamesResult False False (Variable (LambdaVar '.' 0)) env exp
 
 
 manualReduce :: Environment -> Expression -> Int -> InputT IO ()
@@ -162,18 +165,16 @@ manualReduce env exp num = do
     outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m" ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     line <- getInputLine "\x1b[1;33mNext step?\x1b[0m [Y/n/f] (f: finish all remaining steps): "
     case line of
-        Just "n" -> do
-            outputStrLn ("\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;31m" ++ show num)
-            outputStrLn ("\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m" ++ show exp)
-            outputStrLn ("\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+        Just "n" ->
+            outputStrLn $ showSummary env exp num
         Just "f" -> autoReduce env exp num
-        otherwise -> do
+        otherwise ->
             case (hasBetaRedex exp) of
-                True -> do
+                True ->
                     let e2b = betaReduction num exp
-                    manualReduce env (fst e2b) (snd e2b)
-                False -> do
-                    showResult env exp num
+                    in manualReduce env (fst e2b) (snd e2b)
+                False ->
+                    outputStrLn $ showResult env exp num
 
 
 autoReduce :: Environment -> Expression -> Int -> InputT IO ()
@@ -184,7 +185,7 @@ autoReduce env exp num = do
             let e2b = betaReduction num exp
             autoReduce env (fst e2b) (snd e2b)        
         False -> do
-            showResult env exp num
+           outputStrLn $ showResult env exp num
             
 autoProgReduce :: Environment -> Expression -> Int -> IO ()
 autoProgReduce env exp num = do
@@ -194,6 +195,6 @@ autoProgReduce env exp num = do
             let e2b = betaReduction num exp
             autoProgReduce env (fst e2b) (snd e2b)        
         False -> do
-            showProgResult env exp num
+            putStrLn $ showProgResult env exp num
 
 -------------------------------------------------------------------------------------

@@ -38,22 +38,22 @@ execAll (line:ls) env =
                     let exprs = lines content
                     env' <- execAll exprs env
                     execAll ls env'
-                Define v e -> do
-                    let (res, env') = (evalDefine v e) `runState` env
+                Define v e ->
+                    let (res, env') = (evalDefine v e) `runState` env in
                     case res of
                         Left err -> do
                             outputStrLn (show err)
                             execAll ls env'
                         Right f  -> execAll ls env'
-                Show e -> do
-                    let (res, env') = (evalExp e) `runState` env
+                Show e ->
+                    let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do
                             outputStrLn (show err)
                             return env
                         Right exp -> do
                             --putStrLn ("----- original term : " ++ show exp)
-                            showResult env exp 0
+                            outputStrLn $ showResult env exp 0
                             execAll ls env'
                 Print s -> do
                     outputStrLn s
@@ -64,7 +64,7 @@ execute :: String -> Environment -> InputT IO Environment
 execute line env = 
     case readLine line of
             Left (SyntaxError e) -> do
-                outputStrLn $ show e
+                outputStrLn (show e)
                 return env
             Right comm -> case comm of
                 Define v e -> do
@@ -77,7 +77,7 @@ execute line env =
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> outputStrLn $ show err
-                        Right exp -> showResult env exp 0
+                        Right exp -> outputStrLn $ showResult env exp 0
                     return env
                 ShowDetailed e -> do
                     let (res, env') = (evalExp e) `runState` env
@@ -103,13 +103,14 @@ execute line env =
                             liftIO $ mapM_ (saveGlobal outFile) (reverse env)
                             liftIO $ hClose outFile
                             outputStrLn("--- successfully exported to import/" ++ f ++ ".plam")
-                        else do
+                        else
                             outputStrLn("--- export failed : " ++ f ++ " already exists")
                     return env
                 Review r -> do
                     case r of
-                       "all" -> do
+                       "all" ->
                            outputStrLn " ENVIRONMENT:"
+                           >>
                            mapM_ showGlobal env
                        otherwise -> outputStrLn ("--- definition of " ++ show r ++ ": " ++ reviewVariable env r)
                     return env
@@ -128,7 +129,7 @@ execJustProg [] env = return env
 execJustProg (line:ls) env =
     case readLine line of
             Left (SyntaxError err) -> do
-                putStrLn (show err) 
+                putStrLn (show err)
                 return env
             Right comm -> case comm of   
                 Import f -> do
@@ -136,24 +137,24 @@ execJustProg (line:ls) env =
                     let exprs = lines content
                     env' <- execJustProg exprs env
                     execJustProg ls env'
-                Define v e -> do
-                    let (res, env') = (evalDefine v e) `runState` env
+                Define v e ->
+                    let (res, env') = (evalDefine v e) `runState` env in
                     case res of
                         Left err -> do
                             putStrLn (show err)
                             execJustProg ls env'
                         Right f  -> execJustProg ls env'
-                Show e -> do
-                    let (res, env') = (evalExp e) `runState` env
+                Show e ->
+                    let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do
                             putStrLn (show err)
                             return env
                         Right exp -> do
-                            showProgResult env exp 0
+                            putStrLn $ showProgResult env exp 0
                             execJustProg ls env'
-                ShowDetailed e -> do
-                    let (res, env') = (evalExp e) `runState` env
+                ShowDetailed e ->
+                    let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do
                             putStrLn (show err)
@@ -187,22 +188,22 @@ repl env = do
     mline <- getInputLine "\x1b[1;36mpLam>\x1b[0m "
     case mline of
         Nothing -> return ()
-        Just ":quit" -> do
-            outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
-            return ()
-        Just ":q" -> do
-            outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
-            return ()
-        Just line -> do
-            env' <- execute line env
-            repl env'
+        Just line
+            | line == ":quit" || line == ":q"-> do
+                outputStrLn line
+                outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
+                return ()
+            | otherwise -> do
+                outputStrLn line
+                env' <- execute line env
+                repl env'
 
 decideRun :: [String] -> IO()
 decideRun args
     | length args == 0 = do
         putStrLn heading 
         runInputT defaultSettings (repl [])
-    | (length args == 1) && (head args == ":nohead") = do
+    | (length args == 1) && (head args == ":nohead") =
         runInputT defaultSettings (repl [])
     | (length args == 1) && (isplam (head args)) = do
         content <- readFile (head args)
