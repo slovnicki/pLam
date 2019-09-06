@@ -201,9 +201,9 @@ decideRun :: [String] -> IO()
 decideRun args
     | length args == 0 = do
         putStrLn heading 
-        runInputT defaultSettings (repl [])
+        runInput
     | (length args == 1) && (head args == ":nohead") = do
-        runInputT defaultSettings (repl [])
+        runInput
     | (length args == 1) && (isplam (head args)) = do
         content <- readFile (head args)
         let exprs = lines content
@@ -212,8 +212,10 @@ decideRun args
     | otherwise = do
         putStrLn "\x1b[31mignoring argument(s)...\x1b[0m"
         putStrLn heading 
-        runInputT defaultSettings (repl [])
-                  
+        runInput
+    where
+      runInput = runInputT defaultSettings { historyFile = Just ".plam-history" } (repl [])
+
 main :: IO ()
 main = do
     args <- getArgs
