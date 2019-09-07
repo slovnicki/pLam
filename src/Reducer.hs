@@ -104,24 +104,31 @@ hasBetaRedex = not . List.null . betaRedexes
 ---- (other type) application reduces its applicants (first left one to beta nf)
 ---- reducing abstraction is reducing its body
 ---- variable doesnt reduce
-betaReduction :: Int -> Expression -> (Expression, Int)
-betaReduction n (Variable v) = (Variable v, n)
-betaReduction n (Abstraction v e) = let eb = betaReduction n e in
-                                    (Abstraction v (fst eb), snd eb)
-betaReduction n (Application (Abstraction v e) a) = (sub v a e, n+1)
-betaReduction n (Application e1 e2)          
-  | hasBetaRedex e1 = let e1b = betaReduction n e1 in
+betaReduction :: EvaluateOption -> Int -> Expression -> (Expression, Int)
+betaReduction _ n (Variable v) = (Variable v, n)
+betaReduction evop n (Abstraction v e) = let eb = betaReduction evop n e in
+                                         (Abstraction v (fst eb), snd eb)
+betaReduction evop n (Application (Abstraction v e) a)
+  | (evop == CallByValue) && (hasBetaRedex a) = let ab = betaReduction CallByValue n a in
+                                                (Application (Abstraction v e) (fst ab), snd ab)
+  | otherwise = (sub v a e, n+1)
+betaReduction evop n (Application e1 e2)
+  | hasBetaRedex e1 = let e1b = betaReduction evop n e1 in
                       (Application (fst e1b) e2, snd e1b)
-  | otherwise = let e2b = betaReduction n e2 in
+  | otherwise = let e2b = betaReduction evop n e2 in
                 (Application e1 (fst e2b), snd e2b)
 
 --------------------------------------------------------------------------------
 -- computes the beta normal form of a lambda term and count steps
 ---- do one step beta reduction if there are any redexes left
-betaNF :: Int -> Expression -> (Expression, Int)
-betaNF n ex
-  | hasBetaRedex ex = let exb = betaReduction n ex in
-                      betaNF (snd exb) (fst exb)
+betaNF :: EvaluateOption -> Int -> Expression -> (Expression, Int)
+betaNF CallByValue n ex
+  | hasBetaRedex ex = let exb = betaReduction CallByValue n ex in
+                      betaNF CallByValue (snd exb) (fst exb)
+  | otherwise = (ex, n)
+betaNF _ n ex
+  | hasBetaRedex ex = let exb = betaReduction None n ex in
+                      betaNF None (snd exb) (fst exb)
   | otherwise = (ex, n)
 
 
