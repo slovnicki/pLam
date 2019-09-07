@@ -45,7 +45,7 @@ execAll (line:ls) env =
                             outputStrLn (show err)
                             execAll ls env'
                         Right f  -> execAll ls env'
-                Show e ->
+                Evaluate e ->
                     let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do
@@ -73,13 +73,13 @@ execute line env =
                         Left err -> outputStrLn (show err)
                         Right exp -> outputStr ""
                     return env'
-                Show e -> do
+                Evaluate e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> outputStrLn $ show err
                         Right exp -> outputStrLn $ showResult env exp 0
                     return env
-                ShowDetailed e -> do
+                EvaluateDetailed e -> do
                     let (res, env') = (evalExp e) `runState` env
                     case res of
                         Left err -> outputStrLn $ show err
@@ -144,7 +144,7 @@ execJustProg (line:ls) env =
                             putStrLn (show err)
                             execJustProg ls env'
                         Right f  -> execJustProg ls env'
-                Show e ->
+                Evaluate e ->
                     let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do
@@ -153,7 +153,7 @@ execJustProg (line:ls) env =
                         Right exp -> do
                             putStrLn $ showProgResult env exp 0
                             execJustProg ls env'
-                ShowDetailed e ->
+                EvaluateDetailed e ->
                     let (res, env') = (evalExp e) `runState` env in
                     case res of
                         Left err -> do

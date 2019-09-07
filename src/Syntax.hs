@@ -40,8 +40,8 @@ instance Show Expression where
 
 -------------------------------------------------------------------------------------
 data Command = Define String Expression
-             | Show Expression
-             | ShowDetailed Expression
+             | Evaluate Expression
+             | EvaluateDetailed Expression
              | Import String
              | Export String
              | Review String

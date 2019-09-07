@@ -149,17 +149,17 @@ parseDefine = do
     y <- parseExpression
     return $ Define var y
 
-parseShow :: Parser Command
-parseShow = do
+parseEvaluate :: Parser Command
+parseEvaluate = do
     ex <- parseExpression
-    return $ Show ex
+    return $ Evaluate ex
 
-parseShowDetailed :: Parser Command
-parseShowDetailed = do
+parseEvaluateDetailed :: Parser Command
+parseEvaluateDetailed = do
     reserved ":d"
     spaces
     ex <- parseExpression
-    return $ ShowDetailed ex
+    return $ EvaluateDetailed ex
 
 parseImport :: Parser Command
 parseImport = do
@@ -209,14 +209,14 @@ parsePrint = do
     
 parseLine :: Parser Command
 parseLine =  try parseDefine
-         <|> parseShowDetailed
+         <|> parseEvaluateDetailed
          <|> parseImport
          <|> parseExport
          <|> parseReview
          <|> parseRun
          <|> parsePrint
          <|> parseComment
-         <|> parseShow
+         <|> parseEvaluate
          <|> parseEmptyLine
          
 -------------------------------------------------------------------------------------
