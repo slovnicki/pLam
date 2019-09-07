@@ -235,3 +235,29 @@ decideEvaluate env Detailed CallByValue e = do
                 Just "m" -> manualReduce env exp 0
                 otherwise -> autoReduce env exp 0
     return env
+
+decideEvaluateProg :: Environment -> EvaluateOption -> EvaluateOption -> Expression -> IO Environment
+decideEvaluateProg env None None e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> putStrLn $ show err
+        Right exp -> putStrLn $ showProgResult env exp 0
+    return env
+decideEvaluateProg env Detailed None e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> putStrLn $ show err
+        Right exp -> autoProgReduce env exp 0
+    return env
+decideEvaluateProg env None CallByValue e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> putStrLn $ show err
+        Right exp -> putStrLn $ showProgResult env exp 0
+    return env
+decideEvaluateProg env Detailed CallByValue e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> putStrLn $ show err
+        Right exp -> autoProgReduce env exp 0
+    return env
