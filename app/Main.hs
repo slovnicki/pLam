@@ -190,11 +190,9 @@ repl env = do
         Nothing -> return ()
         Just line
             | line == ":quit" || line == ":q"-> do
-                outputStrLn line
                 outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
                 return ()
             | otherwise -> do
-                outputStrLn line
                 env' <- execute line env
                 repl env'
 
