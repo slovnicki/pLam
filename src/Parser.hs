@@ -20,7 +20,7 @@ languageDef =
                                        , ":run"
                                        , ":print"
                                        , ":d"
-                                       , ":b"
+                                       , ":cbv"
                                        ]
              , Token.reservedOpNames = [ "="
                                        , "." 
@@ -149,17 +149,26 @@ parseDefine = do
     y <- parseExpression
     return $ Define var y
 
+-- Evaluate with options
+parseDetailed :: Parser EvaluateOption
+parseDetailed = do
+    reserved ":d"
+    return Detailed
+
+parseCallByValue :: Parser EvaluateOption
+parseCallByValue = do
+    reserved ":cbv"
+    return CallByValue
+
 parseEvaluate :: Parser Command
 parseEvaluate = do
-    ex <- parseExpression
-    return $ Evaluate ex
-
-parseEvaluateDetailed :: Parser Command
-parseEvaluateDetailed = do
-    reserved ":d"
+    det <- option None parseDetailed
     spaces
-    ex <- parseExpression
-    return $ EvaluateDetailed ex
+    cbv <- option None parseCallByValue
+    spaces
+    exp <- parseExpression
+    return $ Evaluate det cbv exp
+-----------------------------------
 
 parseImport :: Parser Command
 parseImport = do
@@ -209,7 +218,6 @@ parsePrint = do
     
 parseLine :: Parser Command
 parseLine =  try parseDefine
-         <|> parseEvaluateDetailed
          <|> parseImport
          <|> parseExport
          <|> parseReview
