@@ -119,7 +119,7 @@ findChurch exp num = do
 
 findBinary :: Expression -> Int -> String
 findBinary exp num = do
-    case exp == fst ((betaNF 0 (createBinary num))) of
+    case exp == fst ((betaNF None 0 (createBinary num))) of
         True -> (show num) ++ "b"
         False -> do
             case num==2047 of
@@ -140,16 +140,16 @@ goodCounter num rednum | rednum==0 = num
                        | otherwise = rednum
 
 -------------------------------------------------------------------------------------
-showResult :: Environment -> Expression -> Int -> String
-showResult env exp num =
-    let expnf = betaNF 0 exp
+showResult :: Environment -> EvaluateOption -> Expression -> Int -> String
+showResult env evop exp num =
+    let expnf = betaNF evop 0 exp
         count = goodCounter num (snd expnf)
     in
         showSummary env (fst expnf) count
 
-showProgResult :: Environment -> Expression -> Int -> String
-showProgResult env exp num =
-    let expnf = betaNF 0 exp
+showProgResult :: Environment -> EvaluateOption -> Expression -> Int -> String
+showProgResult env evop exp num =
+    let expnf = betaNF evop 0 exp
         count = goodCounter num (snd expnf)
     in
         showSummary env (fst expnf) count
@@ -161,42 +161,42 @@ showSummary env exp count =
     "\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m" ++ convertToNamesResult False False (Variable (LambdaVar '.' 0)) env exp
 
 
-manualReduce :: Environment -> Expression -> Int -> InputT IO ()
-manualReduce env exp num = do 
+manualReduce :: Environment -> EvaluateOption -> Expression -> Int -> InputT IO ()
+manualReduce env evop exp num = do 
     outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m" ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     line <- getInputLine "\x1b[1;33mNext step?\x1b[0m [Y/n/f] (f: finish all remaining steps): "
     case line of
         Just "n" ->
             outputStrLn $ showSummary env exp num
-        Just "f" -> autoReduce env exp num
+        Just "f" -> autoReduce env evop exp num
         otherwise ->
             case (hasBetaRedex exp) of
                 True ->
-                    let e2b = betaReduction num exp
-                    in manualReduce env (fst e2b) (snd e2b)
+                    let e2b = betaReduction evop num exp
+                    in manualReduce env evop (fst e2b) (snd e2b)
                 False ->
-                    outputStrLn $ showResult env exp num
+                    outputStrLn $ showResult env evop exp num
 
 
-autoReduce :: Environment -> Expression -> Int -> InputT IO ()
-autoReduce env exp num = do
+autoReduce :: Environment -> EvaluateOption -> Expression -> Int -> InputT IO ()
+autoReduce env evop exp num = do
     outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     case (hasBetaRedex exp) of
         True -> do
-            let e2b = betaReduction num exp
-            autoReduce env (fst e2b) (snd e2b)        
+            let e2b = betaReduction evop num exp
+            autoReduce env evop (fst e2b) (snd e2b)        
         False -> do
-           outputStrLn $ showResult env exp num
+           outputStrLn $ showResult env evop exp num
             
-autoProgReduce :: Environment -> Expression -> Int -> IO ()
-autoProgReduce env exp num = do
+autoProgReduce :: Environment -> EvaluateOption -> Expression -> Int -> IO ()
+autoProgReduce env evop exp num = do
     putStrLn ("#\x1b[1;35m" ++ show num ++ ":\x1b[0m " ++ (convertToNames False False (Variable (LambdaVar '.' 0)) env exp))
     case (hasBetaRedex exp) of
         True -> do
-            let e2b = betaReduction num exp
-            autoProgReduce env (fst e2b) (snd e2b)        
+            let e2b = betaReduction evop num exp
+            autoProgReduce env evop (fst e2b) (snd e2b)        
         False -> do
-            putStrLn $ showProgResult env exp num
+            putStrLn $ showProgResult env evop exp num
 
 -------------------------------------------------------------------------------------
 
@@ -205,7 +205,7 @@ decideEvaluate env None None e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> outputStrLn $ show err
-        Right exp -> outputStrLn $ showResult env exp 0
+        Right exp -> outputStrLn $ showResult env None exp 0
     return env
 decideEvaluate env Detailed None e = do
     let (res, env') = (evalExp e) `runState` env
@@ -214,15 +214,15 @@ decideEvaluate env Detailed None e = do
         Right exp -> do
             op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
             case op of
-                Just "a" -> autoReduce env exp 0
-                Just "m" -> manualReduce env exp 0
-                otherwise -> autoReduce env exp 0
+                Just "a" -> autoReduce env None exp 0
+                Just "m" -> manualReduce env None exp 0
+                otherwise -> autoReduce env None exp 0
     return env
 decideEvaluate env None CallByValue e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> outputStrLn $ show err
-        Right exp -> outputStrLn $ showResult env exp 0
+        Right exp -> outputStrLn $ showResult env CallByValue exp 0
     return env
 decideEvaluate env Detailed CallByValue e = do
     let (res, env') = (evalExp e) `runState` env
@@ -231,9 +231,9 @@ decideEvaluate env Detailed CallByValue e = do
         Right exp -> do
             op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
             case op of
-                Just "a" -> autoReduce env exp 0
-                Just "m" -> manualReduce env exp 0
-                otherwise -> autoReduce env exp 0
+                Just "a" -> autoReduce env CallByValue exp 0
+                Just "m" -> manualReduce env CallByValue exp 0
+                otherwise -> autoReduce env CallByValue exp 0
     return env
 
 decideEvaluateProg :: Environment -> EvaluateOption -> EvaluateOption -> Expression -> IO Environment
@@ -241,23 +241,23 @@ decideEvaluateProg env None None e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> putStrLn $ show err
-        Right exp -> putStrLn $ showProgResult env exp 0
+        Right exp -> putStrLn $ showProgResult env None exp 0
     return env
 decideEvaluateProg env Detailed None e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> putStrLn $ show err
-        Right exp -> autoProgReduce env exp 0
+        Right exp -> autoProgReduce env None exp 0
     return env
 decideEvaluateProg env None CallByValue e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> putStrLn $ show err
-        Right exp -> putStrLn $ showProgResult env exp 0
+        Right exp -> putStrLn $ showProgResult env CallByValue exp 0
     return env
 decideEvaluateProg env Detailed CallByValue e = do
     let (res, env') = (evalExp e) `runState` env
     case res of
         Left err -> putStrLn $ show err
-        Right exp -> autoProgReduce env exp 0
+        Right exp -> autoProgReduce env CallByValue exp 0
     return env
