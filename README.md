@@ -177,9 +177,10 @@ A block of code in pLam is a line, and possible lines (commands) are the followi
 
 ### Evaluate
 
-- syntax: `<λ-expression>` or `:d <λ-expression>`
-- semantics: reduce the `<λ-expression>` to β-normal form. If `:d` is put in front of expression, all the reduction steps will be shown (manually or automatic, depends on what one chooses when asked)
-- example: `\x y. x`, `:d T (T (\x. x) T) T`
+- syntax: `?<evop> ?<evop> <λ-expression>` where `<evop>`s are evaluation options; `:d` and/or `:cbv`
+- semantics: reduce the `<λ-expression>` to β-normal form. If `:d` is chosen as option, all the reduction steps will be shown. If `:cbv` is chosen as option, reductions will be performed in a call-by-value manner, first reducing the argument before substituting it for bound variable. That is, call-by-name is the default reduction option if `:cbv` is not chosen.
+- example: `\x y. x`, `:d T (T (\x. x) T) T`, `:d :cbv T (T (\x. x) T) T`, `:cbv and (or T F) T`
+- example 2: `F omega T` will reduce to `T`, but `:cbv F omega T` will run forever
 - restriction: none
 
 <a name="imp"/>
