@@ -39,9 +39,13 @@ instance Show Expression where
 -------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
+data EvaluateOption = Detailed
+                    | CallByValue
+                    | None
+                    deriving (Eq, Show)
+
 data Command = Define String Expression
-             | Evaluate Expression
-             | EvaluateDetailed Expression
+             | Evaluate EvaluateOption EvaluateOption Expression
              | Import String
              | Export String
              | Review String
