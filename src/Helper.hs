@@ -3,6 +3,7 @@ module Helper where
 import Syntax
 import Reducer
 import Parser
+import Evaluator
 
 import Control.Monad.State
 import System.IO (hFlush, stdout, Handle, hPutStrLn)
@@ -198,3 +199,39 @@ autoProgReduce env exp num = do
             putStrLn $ showProgResult env exp num
 
 -------------------------------------------------------------------------------------
+
+decideEvaluate :: Environment -> EvaluateOption -> EvaluateOption -> Expression -> InputT IO Environment
+decideEvaluate env None None e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> outputStrLn $ show err
+        Right exp -> outputStrLn $ showResult env exp 0
+    return env
+decideEvaluate env Detailed None e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> outputStrLn $ show err
+        Right exp -> do
+            op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
+            case op of
+                Just "a" -> autoReduce env exp 0
+                Just "m" -> manualReduce env exp 0
+                otherwise -> autoReduce env exp 0
+    return env
+decideEvaluate env None CallByValue e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> outputStrLn $ show err
+        Right exp -> outputStrLn $ showResult env exp 0
+    return env
+decideEvaluate env Detailed CallByValue e = do
+    let (res, env') = (evalExp e) `runState` env
+    case res of
+        Left err -> outputStrLn $ show err
+        Right exp -> do
+            op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
+            case op of
+                Just "a" -> autoReduce env exp 0
+                Just "m" -> manualReduce env exp 0
+                otherwise -> autoReduce env exp 0
+    return env
