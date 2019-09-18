@@ -1,6 +1,8 @@
 [![Version](https://img.shields.io/github/release/sandrolovnicki/pLam.svg)]()
 [![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)]()
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=lovnicki.sandro@gmail.com&lc=US&item_name=Donation+for+pLam+development&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted)
+
 <p align="center">
   <img width=100% height=auto src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
 </p>
@@ -405,6 +407,14 @@ Done.
 
 <a name="additional"/>
 
-**Disclaimer for Haskell experts**  
+#### Disclaimer for Haskell experts
+
 I am not a Haskell expert. In fact, this is my first and only Haskell project. It is inevitable that existing code could be written better and I wish to do it in the upcoming future.  
 The goal of the project was to create an environment for easy building of new expressions from previously defined ones, so that one could explore λ-calculus. It was a helper tool so I could define and test a new numeral system in λ-calculus, for my master thesis. Now, when this all went well, the time is coming for me to get back to Haskell code.
+
+### Contributing
+
+If you would like to see some improvements or new features, you can open an issue. I will sort issues into milestones and you will know pretty quickly when to expect it to be done. If you can implement your ideas yourself, great! Pull requests are welcome.
+
+Also, you can [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=lovnicki.sandro@gmail.com&lc=US&item_name=Donation+for+pLam+development&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted) for the development of pLam.
+
