@@ -66,9 +66,15 @@ execute line env =
                     return env'
                 Evaluate det cbv e -> decideEvaluate env det cbv e
                 Import f -> do
-                    content <- liftIO $ readFile (importPath ++ f ++ ".plam")
-                    let exprs = lines content
-                    execAll exprs env
+                    fileExists <- liftIO $ doesFileExist (importPath ++ f ++ ".plam")
+                    if fileExists
+                       then do
+                            content <- liftIO $ readFile (importPath ++ f ++ ".plam")
+                            let exprs = lines content
+                            execAll exprs env
+                       else do
+                            outputStrLn("--- import failed : " ++ f ++ " does not exist")
+                            return env
                 Export f -> do
                     fileExists <- liftIO $ doesFileExist (importPath ++ f ++ ".plam")
                     if not fileExists
