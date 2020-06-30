@@ -14,7 +14,7 @@ import System.Environment
 import System.Directory (doesFileExist)
 
 
-version = "2.2.0"
+version = "2.2.1"
 heading = "\x1b[1;36m\
 \         _\n\
 \        | |\n\
