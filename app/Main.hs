@@ -73,7 +73,7 @@ execute line env =
                             let exprs = lines content
                             execAll exprs env
                        else do
-                            outputStrLn("--- import failed : " ++ f ++ " does not exist")
+                            outputStrLn("--- import failed : " ++ f ++ ".plam does not exist within import/")
                             return env
                 Export f -> do
                     fileExists <- liftIO $ doesFileExist (importPath ++ f ++ ".plam")
