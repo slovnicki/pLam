@@ -1,0 +1,31 @@
+name: pLam
+version: 2.2.1
+author: Sandro Lovnički
+license: BSD3
+github: sandrolovnicki/pLam
+
+default-extensions:
+  - ImportQualifiedPost
+  - LambdaCase
+
+dependencies:
+- base >=4.7 && <5
+- mtl
+- containers
+- haskeline
+- parsec
+
+library:
+  source-dirs: src
+
+executables:
+  plam:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - pLam
+    - directory
