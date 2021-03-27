@@ -1,40 +1,60 @@
-name:                pLam
-version:             2.2.1
--- synopsis:
--- description:
-homepage:            https://github.com/sandrolovnicki/pLam#readme
-license:             BSD3
-license-file:        LICENSE
-author:              Sandro Lovnički
-maintainer:          lovnicki.sandro@gmail.com
-copyright:           2019 Sandro Lovnički
-category:            Web
-build-type:          Simple
-extra-source-files:  README.md
-cabal-version:       >=1.10
+cabal-version: 1.12
 
-library
-  hs-source-dirs:      src
-  exposed-modules:     Parser Syntax Evaluator Reducer Helper Config
-  build-depends:       base >= 4.7 && < 5
-                     , parsec
-                     , mtl
-                     , containers
-                     , haskeline
-  default-language:    Haskell2010
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: fc07851370788f9c5f9f5faf9c2d5074270149a1d58276931a72843581b59b39
 
-executable plam
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , pLam
-                     , mtl
-                     , containers
-                     , haskeline
-                     , directory
-  default-language:    Haskell2010
+name:           pLam
+version:        2.2.1
+homepage:       https://github.com/sandrolovnicki/pLam#readme
+bug-reports:    https://github.com/sandrolovnicki/pLam/issues
+author:         Sandro Lovnički
+maintainer:     Sandro Lovnički
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
 
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/sandrolovnicki/pLam
+
+library
+  exposed-modules:
+      Config
+      Evaluator
+      Helper
+      Parser
+      Reducer
+      Syntax
+  other-modules:
+      Paths_pLam
+  hs-source-dirs:
+      src
+  default-extensions: ImportQualifiedPost LambdaCase
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , haskeline
+    , mtl
+    , parsec
+  default-language: Haskell2010
+
+executable plam
+  main-is: Main.hs
+  other-modules:
+      Paths_pLam
+  hs-source-dirs:
+      app
+  default-extensions: ImportQualifiedPost LambdaCase
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , directory
+    , haskeline
+    , mtl
+    , pLam
+    , parsec
+  default-language: Haskell2010
