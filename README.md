@@ -1,7 +1,7 @@
 [![Version](https://img.shields.io/github/release/sandrolovnicki/pLam.svg)](https://github.com/sandrolovnicki/pLam/releases)
 [![License](https://img.shields.io/github/license/sandrolovnicki/pLam.svg)](https://github.com/sandrolovnicki/pLam/blob/master/LICENSE)
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=lovnicki.sandro@gmail.com&lc=US&item_name=Donation+for+pLam+development&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted)
+<a href="https://www.buymeacoffee.com/slovnicki" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="30px" width= "108px"></a>
 
 <p align="center">
   <img width=100% height=auto src="https://raw.githubusercontent.com/sandrolovnicki/pLam/master/res/demo-v2.gif">
@@ -418,6 +418,3 @@ The goal of the project was to create an environment for easy building of new ex
 ### Contributing
 
 If you would like to see some improvements or new features, you can open an issue. I will sort issues into milestones and you will know pretty quickly when to expect it to be done. If you can implement your ideas yourself, great! Pull requests are welcome.
-
-Also, you can [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=lovnicki.sandro@gmail.com&lc=US&item_name=Donation+for+pLam+development&no_note=0&cn=&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted) for the development of pLam.
-
