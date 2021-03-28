@@ -3,6 +3,8 @@ import Control.Monad.State
 import Debug.Trace
 import Evaluator
 import Helper
+import Options.Applicative
+import Options.Applicative qualified as Options
 import Parser
 import Reducer
 import Syntax
@@ -165,26 +167,28 @@ repl env = do
         env' <- execute line env
         repl env'
 
-decideRun :: [String] -> IO ()
-decideRun args
-  | null args = do
-    putStrLn heading
-    runInput
-  | (length args == 1) && (head args == ":nohead") = do
-    runInput
-  | (length args == 1) && isplam (head args) = do
-    content <- readFile (head args)
-    let exprs = lines content
-    execJustProg exprs []
-    putStrLn $ boldGreen "Done."
-  | otherwise = do
-    putStrLn $ red "ignoring argument(s)..."
-    putStrLn heading
-    runInput
+data Options
+  = FileInput FilePath
+  | Repl Bool
+
+options :: Options.Parser Options
+options = fileInput <|> replOpts
   where
-    runInput = runInputT defaultSettings {historyFile = Just ".plam-history"} (repl [])
+    fileInput :: Options.Parser Options
+    fileInput = FileInput <$> argument str (metavar "FILE" <> help ".plam file to evaluate")
+
+    replOpts :: Options.Parser Options
+    replOpts = Repl <$> switch (long "no-heading" <> help "Don't display the heading")
 
 main :: IO ()
 main = do
-  args <- getArgs
-  decideRun args
+  args <- execParser (info (options <**> helper) (fullDesc <> progDesc "pure λ-calculus interpreter"))
+  case args of
+    FileInput file -> do
+      content <- readFile file
+      let exprs = lines content
+      execJustProg exprs []
+      putStrLn $ boldGreen "Done."
+    Repl noHeading -> do
+      unless noHeading $ putStrLn heading
+      runInputT defaultSettings {historyFile = Just ".plam-history"} (repl [])
