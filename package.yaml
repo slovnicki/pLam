@@ -14,6 +14,7 @@ dependencies:
 - containers
 - haskeline
 - parsec
+- ansi-terminal
 
 library:
   source-dirs: src

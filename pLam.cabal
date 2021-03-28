@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fc07851370788f9c5f9f5faf9c2d5074270149a1d58276931a72843581b59b39
+-- hash: 0b070e72be3e599b16c2401f36ad3944de31b8e51d08981537561a0513c8aa49
 
 name:           pLam
 version:        2.2.1
@@ -34,7 +34,8 @@ library
       src
   default-extensions: ImportQualifiedPost LambdaCase
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
     , containers
     , haskeline
     , mtl
@@ -50,7 +51,8 @@ executable plam
   default-extensions: ImportQualifiedPost LambdaCase
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
     , containers
     , directory
     , haskeline
