@@ -15,16 +15,21 @@ import System.IO (IOMode (WriteMode), hClose, hFlush, hPutStrLn, openFile, stdou
 version = "2.2.1"
 
 heading =
-  "\x1b[1;36m\
-  \         _\n\
-  \        | |\n\
-  \    ____| |   ___  __  __\n\
-  \    | _ \\ |__| _ \\|  \\/  |\n\
-  \    |  _/____|____\\_\\__/_| \x1b[32mv"
-    ++ version
-    ++ "\n\
-       \    \x1b[1;36m|_| \x1b[0mpure λ-calculus interpreter\n\
-       \   \x1b[1;36m=================================\n"
+  boldCyan
+    "         _\n\
+    \        | |\n\
+    \    ____| |   ___  __  __\n\
+    \    | _ \\ |__| _ \\|  \\/  |\n\
+    \    |  _/____|____\\_\\__/_| "
+    ++ boldGreen
+      ( "v"
+          ++ version
+          ++ "\n    "
+      )
+    ++ boldCyan "|_| "
+    ++ "pure λ-calculus interpreter\n\
+       \   "
+    ++ boldCyan "=================================\n"
 
 -------------------------------------------------------------------------------------
 
@@ -149,12 +154,12 @@ isplam (c : cs)
 -- MAIN with Read-Evaluate-Print Loop --
 -------------------------------------------------------------------------------------
 repl env = do
-  mline <- getInputLine "\x1b[1;36mpLam>\x1b[0m "
+  mline <- getInputLine $ boldCyan "pLam>" ++ " "
   case mline of
     Nothing -> return ()
     Just line
       | line == ":quit" || line == ":q" -> do
-        outputStrLn "\x1b[1;32mGoodbye!\x1b[0m"
+        outputStrLn $ boldCyan "Goodbye!"
         return ()
       | otherwise -> do
         env' <- execute line env
@@ -171,9 +176,9 @@ decideRun args
     content <- readFile (head args)
     let exprs = lines content
     execJustProg exprs []
-    putStrLn "\x1b[1;32mDone.\x1b[0m"
+    putStrLn $ boldGreen "Done."
   | otherwise = do
-    putStrLn "\x1b[31mignoring argument(s)...\x1b[0m"
+    putStrLn $ red "ignoring argument(s)..."
     putStrLn heading
     runInput
   where

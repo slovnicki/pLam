@@ -6,8 +6,37 @@ import Evaluator
 import Parser
 import Reducer
 import Syntax
+import System.Console.ANSI.Codes (setSGRCode)
+import System.Console.ANSI.Types (Color (..), ColorIntensity (..), ConsoleIntensity (..), ConsoleLayer (..), SGR (..))
 import System.Console.Haskeline
 import System.IO (Handle, hFlush, hPutStrLn, stdout)
+
+red :: String -> String
+red s = setSGRCode [SetConsoleIntensity NormalIntensity, SetColor Foreground Dull Red] <> s <> setSGRCode [Reset]
+
+magenta :: String -> String
+magenta s = setSGRCode [SetConsoleIntensity NormalIntensity, SetColor Foreground Dull Magenta] <> s <> setSGRCode [Reset]
+
+cyan :: String -> String
+cyan s = setSGRCode [SetConsoleIntensity NormalIntensity, SetColor Foreground Dull Cyan] <> s <> setSGRCode [Reset]
+
+yellow :: String -> String
+yellow s = setSGRCode [SetConsoleIntensity NormalIntensity, SetColor Foreground Dull Yellow] <> s <> setSGRCode [Reset]
+
+boldCyan :: String -> String
+boldCyan s = setSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Dull Cyan] <> s <> setSGRCode [Reset]
+
+boldMagenta :: String -> String
+boldMagenta s = setSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Dull Magenta] <> s <> setSGRCode [Reset]
+
+boldRed :: String -> String
+boldRed s = setSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Dull Red] <> s <> setSGRCode [Reset]
+
+boldGreen :: String -> String
+boldGreen s = setSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Dull Green] <> s <> setSGRCode [Reset]
+
+boldYellow :: String -> String
+boldYellow s = setSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Dull Yellow] <> s <> setSGRCode [Reset]
 
 -------------------------------------------------------------------------------------
 showGlobal :: (String, Expression) -> InputT IO ()
@@ -36,7 +65,7 @@ convertToName ((v, e) : rest) ex
 convertToNames :: Bool -> Bool -> Expression -> Environment -> Expression -> String
 convertToNames redexFound redexVarFind redexVar env (Variable v) =
   if redexVarFind && (Variable v == redexVar)
-    then "\x1b[0;31m" ++ show v ++ "\x1b[0m"
+    then red $ show v
     else show v
 convertToNames redexFound redexVarFind redexVar env redex@(Application (Abstraction v e) n) =
   if redexFound
@@ -45,7 +74,7 @@ convertToNames redexFound redexVarFind redexVar env redex@(Application (Abstract
        in if redex1 == "none"
             then "(" ++ convertToNames True False redexVar env (Abstraction v e) ++ " " ++ convertToNames True False redexVar env n ++ ")"
             else redex1
-    else "\x1b[0;35m(\x1b[1;36m(λ\x1b[1;31m" ++ show v ++ "\x1b[1;36m.\x1b[0;36m " ++ convertToNames True True (Variable v) env e ++ "\x1b[1;36m) \x1b[1;32m" ++ convertToNames True False redexVar env n ++ "\x1b[0;35m)\x1b[0m"
+    else magenta "(" ++ boldCyan "λ" ++ boldRed (show v) ++ boldCyan "." ++ cyan (" " ++ convertToNames True True (Variable v) env e) ++ boldCyan ") " ++ boldGreen (convertToNames True False redexVar env n) ++ magenta ")"
 convertToNames redexFound redexVarFind redexVar env app@(Application m n) =
   let app1 = convertToName env app
    in if app1 == "none"
@@ -62,7 +91,7 @@ convertToNames redexFound redexVarFind redexVar env abs@(Abstraction v e) =
 convertToNamesResult :: Bool -> Bool -> Expression -> Environment -> Expression -> String
 convertToNamesResult redexFound redexVarFind redexVar env (Variable v) =
   if redexVarFind && (Variable v == redexVar)
-    then "\x1b[0;31m" ++ show v ++ "\x1b[0m"
+    then red $ show v
     else show v
 convertToNamesResult redexFound redexVarFind redexVar env redex@(Application (Abstraction v e) n) =
   if redexFound
@@ -71,17 +100,17 @@ convertToNamesResult redexFound redexVarFind redexVar env redex@(Application (Ab
        in if redex1 == "none"
             then "(" ++ convertToNamesResult True False redexVar env (Abstraction v e) ++ " " ++ convertToNamesResult True False redexVar env n ++ ")"
             else redex1
-    else "\x1b[0;35m(\x1b[1;36m(λ\x1b[1;31m" ++ show v ++ "\x1b[1;36m.\x1b[0;36m " ++ convertToNamesResult True True (Variable v) env e ++ "\x1b[1;36m) \x1b[1;32m" ++ convertToNamesResult True False redexVar env n ++ "\x1b[0;35m)\x1b[0m"
+    else magenta "(" ++ boldCyan "(λ" ++ boldRed (show v) ++ boldCyan "." ++ cyan (" " ++ convertToNamesResult True True (Variable v) env e) ++ boldCyan ") " ++ boldGreen (convertToNamesResult True False redexVar env n) ++ magenta ")"
 convertToNamesResult redexFound redexVarFind redexVar env app@(Application m n) =
   let app1 = convertToName env app
    in if app1 == "none"
-        then "\x1b[0;35m(\x1b[0m" ++ convertToNamesResult redexFound redexVarFind redexVar env m ++ " " ++ convertToNamesResult redexFound redexVarFind redexVar env n ++ "\x1b[0;35m)\x1b[0m"
-        else "\x1b[1;32m" ++ app1 ++ "\x1b[0m"
+        then magenta "(" ++ convertToNamesResult redexFound redexVarFind redexVar env m ++ " " ++ convertToNamesResult redexFound redexVarFind redexVar env n ++ magenta ")"
+        else boldGreen app1
 convertToNamesResult redexFound redexVarFind redexVar env abs@(Abstraction v e) =
   let abs1 = convertToName env abs
    in if abs1 == "none"
-        then "\x1b[0;36m(\x1b[1;36mλ\x1b[0m" ++ show v ++ "\x1b[1;36m.\x1b[0m " ++ convertToNamesResult redexFound redexVarFind redexVar env e ++ "\x1b[0;36m)\x1b[0m"
-        else "\x1b[1;32m" ++ abs1 ++ "\x1b[0m"
+        then cyan "(" ++ boldCyan "λ" ++ show v ++ boldCyan "." ++ " " ++ convertToNamesResult redexFound redexVarFind redexVar env e ++ cyan ")"
+        else boldGreen abs1
 
 -----------------------------------------------------------------------------------------------------------
 isDefined :: Environment -> String -> Bool
@@ -142,17 +171,23 @@ showProgResult env evop exp num =
 
 showSummary :: Environment -> Expression -> Int -> String
 showSummary env exp count =
-  "\x1b[1;32m|> \x1b[0;33mreductions count               : \x1b[1;31m" ++ show count ++ "\n"
-    ++ "\x1b[1;32m|> \x1b[0;33muncurried \x1b[1;33mβ-normal\x1b[0;33m form        : \x1b[0m"
+  boldGreen "|> " ++ yellow "reductions count               : " ++ boldRed (show count ++ "\n")
+    ++ boldGreen "|> "
+    ++ yellow "uncurried "
+    ++ boldYellow "β-normal"
+    ++ yellow " form        : "
     ++ show exp
     ++ "\n"
-    ++ "\x1b[1;32m|> \x1b[0;33mcurried (partial) \x1b[1;33mα-equivalent\x1b[0;33m : \x1b[0m"
+    ++ boldGreen "|> "
+    ++ yellow "curried (partial) "
+    ++ boldYellow "α-equivalent"
+    ++ yellow " : "
     ++ convertToNamesResult False False (Variable (LambdaVar '.' 0)) env exp
 
 manualReduce :: Environment -> EvaluateOption -> Expression -> Int -> InputT IO ()
 manualReduce env evop exp num = do
-  outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m" ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
-  line <- getInputLine "\x1b[1;33mNext step?\x1b[0m [Y/n/f] (f: finish all remaining steps): "
+  outputStrLn (boldMagenta ("#" ++ show num ++ ":") ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+  line <- getInputLine $ boldYellow "Next step?" ++ " [Y/n/f] (f: finish all remaining steps): "
   case line of
     Just "n" ->
       outputStrLn $ showSummary env exp num
@@ -164,14 +199,14 @@ manualReduce env evop exp num = do
 
 autoReduce :: Environment -> EvaluateOption -> Expression -> Int -> InputT IO ()
 autoReduce env evop exp num = do
-  outputStrLn ("\x1b[1;35m#" ++ show num ++ ":\x1b[0m " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+  outputStrLn (boldMagenta ("#" ++ show num ++ ":") ++ " " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
   if hasBetaRedex exp
     then uncurry (autoReduce env evop) (betaReduction evop num exp)
     else outputStrLn $ showResult env evop exp num
 
 autoProgReduce :: Environment -> EvaluateOption -> Expression -> Int -> IO ()
 autoProgReduce env evop exp num = do
-  putStrLn ("#\x1b[1;35m" ++ show num ++ ":\x1b[0m " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
+  putStrLn ("#" ++ boldMagenta (show num ++ ":") ++ " " ++ convertToNames False False (Variable (LambdaVar '.' 0)) env exp)
   if hasBetaRedex exp
     then uncurry (autoProgReduce env evop) (betaReduction evop num exp)
     else putStrLn $ showProgResult env evop exp num
@@ -190,7 +225,7 @@ decideEvaluate env Detailed None e = do
   case res of
     Left err -> outputStrLn $ show err
     Right exp -> do
-      op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
+      op <- getInputLine $ boldYellow "Choose stepping option" ++ " ([default] a: auto all, m: manual step-by-step): "
       case op of
         Just "a" -> autoReduce env None exp 0
         Just "m" -> manualReduce env None exp 0
@@ -207,7 +242,7 @@ decideEvaluate env Detailed CallByValue e = do
   case res of
     Left err -> outputStrLn $ show err
     Right exp -> do
-      op <- getInputLine "\x1b[1;33mChoose stepping option\x1b[0m ([default] a: auto all, m: manual step-by-step): "
+      op <- getInputLine $ boldYellow "Choose stepping option" ++ " ([default] a: auto all, m: manual step-by-step): "
       case op of
         Just "a" -> autoReduce env CallByValue exp 0
         Just "m" -> manualReduce env CallByValue exp 0
