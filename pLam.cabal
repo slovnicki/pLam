@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0b070e72be3e599b16c2401f36ad3944de31b8e51d08981537561a0513c8aa49
+-- hash: eba382f62b4ab2b15d95a9088737dc2f9dda1e7e622d618bf439dae9cb891b4d
 
 name:           pLam
 version:        2.2.1
@@ -57,6 +57,7 @@ executable plam
     , directory
     , haskeline
     , mtl
+    , optparse-applicative
     , pLam
     , parsec
   default-language: Haskell2010
