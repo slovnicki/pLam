@@ -2,6 +2,7 @@ module Parser where
 
 import Control.Monad.State
 import Data.Char
+import Data.Functor.Identity (Identity)
 import Debug.Trace
 import Syntax
 import Text.Parsec hiding (State)
@@ -9,6 +10,7 @@ import Text.Parsec.Language
 import Text.Parsec.Token qualified as Token
 
 -------------------------------------------------------------------------------------
+languageDef :: GenLanguageDef String u Identity
 languageDef =
   emptyDef
     { Token.commentLine = "--",
@@ -31,16 +33,22 @@ languageDef =
         ]
     }
 
+lexer :: Token.GenTokenParser String u Identity
 lexer = Token.makeTokenParser languageDef
 
+identifier :: Parser String
 identifier = Token.identifier lexer
 
+reserved :: String -> Parser ()
 reserved = Token.reserved lexer
 
+reservedOp :: String -> Parser ()
 reservedOp = Token.reservedOp lexer
 
+parens :: Parser a -> Parser a
 parens = Token.parens lexer
 
+comma :: Parser String
 comma = Token.comma lexer
 
 -------------------------------------------------------------------------------------
@@ -62,18 +70,21 @@ createChurch 0 exp = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'x' 0
 createChurch n exp = createChurch (n -1) (Application (Variable (LambdaVar 'f' 0)) exp)
 
 -- HELP EXPRS --
+true :: Expression
 true = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Variable (LambdaVar 'x' 0)))
 
+false :: Expression
 false = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Variable (LambdaVar 'y' 0)))
 
+pair :: Expression
 pair = Abstraction (LambdaVar 'x' 0) (Abstraction (LambdaVar 'y' 0) (Abstraction (LambdaVar 'p' 0) (Application (Application (Variable (LambdaVar 'p' 0)) (Variable (LambdaVar 'x' 0))) (Variable (LambdaVar 'y' 0)))))
 
+end :: Expression
 end = Abstraction (LambdaVar 'e' 0) true
 
 whichBit :: Int -> Expression
-whichBit b
-  | b == 0 = false
-  | b == 1 = true
+whichBit 0 = false
+whichBit 1 = true
 
 ----------------
 createBinary' :: Int -> Expression
@@ -86,6 +97,7 @@ createBinary 0 = Application (Application pair false) end
 createBinary n = createBinary' n
 
 -- LIST --
+empty :: Expression
 empty = Abstraction (LambdaVar 'f' 0) (Abstraction (LambdaVar 'l' 0) (Variable (LambdaVar 'f' 0)))
 
 createList :: [Expression] -> Expression
@@ -100,27 +112,26 @@ parseList = do
   reservedOp "["
   exprs <- parseExpression `sepBy` comma
   reservedOp "]"
-  return $ createList exprs
+  pure $ createList exprs
 
 parseNumeral :: Parser Expression
 parseNumeral = do
   strNum <- many1 digit
   spaces
-  let intNum = read strNum :: Int
   maybeB <- optionMaybe (char 'b')
-  return $
+  pure $
     if maybeB == Just 'b'
-      then createBinary intNum
-      else createChurch intNum (Variable (LambdaVar 'x' 0))
+      then createBinary (read strNum :: Int)
+      else createChurch (read strNum :: Int) (Variable (LambdaVar 'x' 0))
 
 parseVariable :: Parser Expression
 parseVariable = do
   x <- identifier
   spaces
-  return $
-    if length x == 1 && isLower (head x)
-      then Variable (LambdaVar (head x) 0)
-      else EnvironmentVar x
+  pure $ case x of
+    [c]
+      | isLower c -> Variable (LambdaVar c 0)
+    _ -> EnvironmentVar x
 
 parseAbstraction :: Parser Expression
 parseAbstraction = do
@@ -136,7 +147,7 @@ parseAbstraction = do
 parseApplication :: Parser Expression
 parseApplication = do
   es <- sepBy1 parseSingleton spaces
-  return $ foldl1 Application es
+  pure $ foldl1 Application es
 
 parseSingleton :: Parser Expression
 parseSingleton =
@@ -151,7 +162,7 @@ parseExpression = do
   spaces
   expr <- parseApplication <|> parseSingleton
   spaces
-  return expr
+  pure expr
 
 -------------------------------------------------------------------------------------
 
@@ -166,14 +177,10 @@ parseDefine = do
 
 -- Evaluate with options
 parseDetailed :: Parser EvaluateOption
-parseDetailed = do
-  reserved ":d"
-  return Detailed
+parseDetailed = Detailed <$ reserved ":d"
 
 parseCallByValue :: Parser EvaluateOption
-parseCallByValue = do
-  reserved ":cbv"
-  return CallByValue
+parseCallByValue = CallByValue <$ reserved ":cbv"
 
 parseEvaluate :: Parser Command
 parseEvaluate = do
@@ -204,14 +211,12 @@ parseReview = do
   Review <$> identifier
 
 parseComment :: Parser Command
-parseComment = do
-  comm <- string "--"
-  Comment <$> comment
+parseComment =
+  string "--"
+    >> Comment <$> comment
 
 parseEmptyLine :: Parser Command
-parseEmptyLine = do
-  emp <- string ""
-  return $ Comment " "
+parseEmptyLine = Comment " " <$ string ""
 
 parseRun :: Parser Command
 parseRun = do
